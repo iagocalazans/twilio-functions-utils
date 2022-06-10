@@ -85,7 +85,10 @@ npm install twilio-functions-utils
 ```js
 // File: assets/create.private.js
 
-exports.create = async function () {
+exports.create = async function (event) {
+  // Here you can acess  Twilio Client as client and Context as props (so you can get env vars).
+  const { client, props } = this
+
   return new Promise((resolve, reject) => {
     const random = Math.random();
 
@@ -122,7 +125,7 @@ const { create } = require(Runtime.getAssets()['/create.js'].path)
  */
 async function createAction(event) {
   // You can perform all your "controller" level actions, as you have access to the request headers and cookies.
-  const { cookies, request } = this
+  const { cookies, request, client, props } = this
 
   // Then just call the useCase you provided to handler by using useInjection.
   const useCaseResult = await this.useCase.create(event)
