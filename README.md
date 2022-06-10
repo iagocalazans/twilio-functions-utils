@@ -13,7 +13,31 @@ This lib was created with the aim of simplifying the use of serverless Twilio, r
 
 The useInjection method takes two parameters. The first to apply as a handler and the last is an object of configuration options.
 
-> Options object can contain providers that will be defined, which act as use cases to perform internal actions in the handler function through the "this" method.
+#### [useInjection] Options
+
+Can contain providers that will be defined, which act as use cases to perform internal actions in the handler function through the "this" method.
+
+You can pass `validateToken` equal true too, to force Token validation using [Twilio Flex Token Validator](https://github.com/twilio/twilio-flex-token-validator)
+
+```js
+useInjection(yourFunction,
+  {
+    providers: [create, remove],
+    validateToken: true
+  }
+);
+```
+
+#### [Twilio Flex Token Validator](https://github.com/twilio/twilio-flex-token-validator)
+
+When using Token Validator, the Request body must contain a valid Token from Twilio.
+
+```js
+// Event
+{
+  Token: "Twilio-Token-Here"
+}
+```
 
 ### Response
 
@@ -111,6 +135,7 @@ exports.handler = useInjection(createAction, {
   providers: [
     create,
   ],
+  validateToken: true, // When using Token Validator, the Request body must contain a valid Token from Twilio.
 });
 ```
 

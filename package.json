@@ -32,7 +32,8 @@
   "homepage": "https://github.com/iagocalazans/twilio-functions-utils#readme",
   "dependencies": {
     "@twilio/runtime-handler": "^1.2.3",
-    "twilio": "^3.77.2"
+    "twilio": "^3.77.2",
+    "twilio-flex-token-validator": "^1.5.6"
   },
   "devDependencies": {
     "@twilio-labs/serverless-runtime-types": "^2.2.3",
