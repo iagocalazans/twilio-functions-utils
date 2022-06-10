@@ -1,0 +1,119 @@
+
+# Twilio Functions Utils
+
+<img src="https://avatars.githubusercontent.com/u/109142?s=200&v=4" width="100" />
+
+## About
+
+This lib was created with the aim of simplifying the use of serverless Twilio, reducing the need to apply frequent try-catches and improving context management, making it no longer necessary to return the callback() method in all functions.
+
+## How it works
+
+### useInjection
+
+The useInjection method takes two parameters. The first to apply as a handler and the last is an object of configuration options.
+
+> Options object can contain providers that will be defined, which act as use cases to perform internal actions in the handler function through the "this" method.
+
+### Response
+
+The responses coming from the function destined to the handler must be returned as an instance of Response.
+
+Response recebe uma string e um number (status code):
+
+```js
+return new Response('Your pretty answer.', 200);
+```
+
+There are two failure response models, BadRequest and NotFound. The use follows the same model.
+
+```js
+const notFound = new NotFoundError('Your error message here.');
+const badRequest = new BadRequestError('Your error message here.');
+```
+
+### TwiMLResponse
+
+There is an own response template to use with the TwiML format:
+
+```js
+const twimlVoice = new Twilio.twiml
+  .VoiceResponse();
+
+const enqueueVoice = twimlVoice
+  .enqueue({
+    action,
+    workflowSid,
+  })
+  .task('{}');
+
+return new TwiMLResponse(twimlVoice, 201)
+```
+
+## Install
+
+```cmd
+npm install twilio-functions-utils
+```
+
+## Usage
+
+```js
+// File: assets/create.private.js
+
+exports.create = async function () {
+  return new Promise((resolve, reject) => {
+    const random = Math.random();
+
+    if (random >= 0.5) {
+      return resolve({ sucess: 'Resolved' });
+    }
+  
+    return reject(new Error('Unresolved'));
+  });
+};
+```
+
+```js
+// File: functions/create.js
+
+const { useInjection, Response } = require('twilio-functions-utils');
+const { create } = require(Runtime.getAssets()['/create.js'].path)
+
+/**
+ * @param { Record<string, unknown> } event
+ * @this { {
+ * request: Record<string, unknown>,
+ * cookies: Record<string, string>,
+ * client: import('twilio').Twilio,
+ * props: {
+ *      TWILIO_WORKFLOW_SID: string,
+ *      TWILIO_WORKFLOW_SID: string,
+ *      DOMAIN_NAME: string
+ * },
+ * useCase: {
+ *      create: create,
+ * } } }
+ * @returns { Promise<unknown> }
+ */
+async function createAction(event) {
+  // You can perform all your "controller" level actions, as you have access to the request headers and cookies.
+  const { cookies, request } = this
+
+  // Then just call the useCase you provided to handler by using useInjection.
+  const useCaseResult = await this.useCase.create(event)
+
+  // Just put it on a Response object and you are good to go!
+  return new Response(useCaseResult, 201);
+}
+
+exports.handler = useInjection(createAction, {
+  providers: [
+    create,
+  ],
+});
+```
+
+## Author
+
+- [Iago Calazans](https://github.com/iagocalazans) - 🛠 Senior Node.js Engineer at [Stone](https://www.stone.com.br/)
