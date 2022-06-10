@@ -22,7 +22,7 @@ You can pass `validateToken` equal true too, to force Token validation using [Tw
 ```js
 useInjection(yourFunction,
   {
-    providers: [create, remove],
+    providers: { create, remove },
     validateToken: true
   }
 );
@@ -132,9 +132,9 @@ async function createAction(event) {
 }
 
 exports.handler = useInjection(createAction, {
-  providers: [
+  providers: {
     create,
-  ],
+  },
   validateToken: true, // When using Token Validator, the Request body must contain a valid Token from Twilio.
 });
 ```
