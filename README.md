@@ -118,7 +118,7 @@ const { create } = require(Runtime.getAssets()['/create.js'].path)
  *      TWILIO_WORKFLOW_SID: string,
  *      DOMAIN_NAME: string
  * },
- * useCase: {
+ * providers: {
  *      create: create,
  * } } }
  * @returns { Promise<unknown> }
@@ -127,11 +127,11 @@ async function createAction(event) {
   // You can perform all your "controller" level actions, as you have access to the request headers and cookies.
   const { cookies, request, client, props } = this
 
-  // Then just call the useCase you provided to handler by using useInjection.
-  const useCaseResult = await this.useCase.create(event)
+  // Then just call the providers you provided to handler by using useInjection.
+  const providerResult = await this.providers.create(event)
 
   // Just put it on a Response object and you are good to go!
-  return new Response(useCaseResult, 201);
+  return new Response(providerResult, 201);
 }
 
 exports.handler = useInjection(createAction, {
