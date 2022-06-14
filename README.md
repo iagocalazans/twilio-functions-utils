@@ -13,7 +13,7 @@ This lib was created with the aim of simplifying the use of serverless Twilio, r
 
 The useInjection method takes two parameters. The first to apply as a handler and the last is an object of configuration options.
 
-#### [useInjection] Options
+##### [useInjection] Options
 
 Can contain providers that will be defined, which act as use cases to perform internal actions in the handler function through the "this" method.
 
@@ -28,7 +28,7 @@ useInjection(yourFunction,
 );
 ```
 
-#### [Twilio Flex Token Validator](https://github.com/twilio/twilio-flex-token-validator)
+##### [Twilio Flex Token Validator](https://github.com/twilio/twilio-flex-token-validator)
 
 When using Token Validator, the Request body must contain a valid Token from Twilio.
 
@@ -82,12 +82,14 @@ npm install twilio-functions-utils
 
 ## Usage
 
+> **USE CONVENTIONAL FUNCTIONS** ➜ `Arrow functions didn't works as expected as 'this' can't be injected`.
+
 ```js
 // File: assets/create.private.js
 
 exports.create = async function (event) {
-  // Here you can acess  Twilio Client as client and Context as props (so you can get env vars).
-  const { client, props } = this
+  // Here you can acess  Twilio Client as client and Context as env (so you can get env vars).
+  const { client, env } = this
 
   return new Promise((resolve, reject) => {
     const random = Math.random();
@@ -113,7 +115,7 @@ const { create } = require(Runtime.getAssets()['/create.js'].path)
  * request: Record<string, unknown>,
  * cookies: Record<string, string>,
  * client: import('twilio').Twilio,
- * props: {
+ * env: {
  *      TWILIO_WORKFLOW_SID: string,
  *      TWILIO_WORKFLOW_SID: string,
  *      DOMAIN_NAME: string
@@ -125,7 +127,7 @@ const { create } = require(Runtime.getAssets()['/create.js'].path)
  */
 async function createAction(event) {
   // You can perform all your "controller" level actions, as you have access to the request headers and cookies.
-  const { cookies, request, client, props } = this
+  const { cookies, request, client, env } = this
 
   // Then just call the providers you provided to handler by using useInjection.
   const providerResult = await this.providers.create(event)
