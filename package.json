@@ -36,6 +36,11 @@
     "twilio": "^3.77.2",
     "twilio-flex-token-validator": "^1.5.6"
   },
+  "overrides": {
+    "@twilio/runtime-handler@^1.2.3": {
+      "moment": ">=2.29.2"
+    }
+  },
   "devDependencies": {
     "@twilio-labs/serverless-runtime-types": "^2.2.3",
     "eslint": "^8.14.0",
