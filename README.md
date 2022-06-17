@@ -43,13 +43,13 @@ When using Token Validator, the Request body must contain a valid Token from Twi
 
 The responses coming from the function destined to the handler must be returned as an instance of Response.
 
-Response recebe uma string e um number (status code):
+Response receives a string and a number (status code):
 
 ```js
 return new Response('Your pretty answer.', 200);
 ```
 
-There are two failure response models, BadRequest and NotFound. The use follows the same model.
+There are two failure response models, BadRequest and NotFound. Its use follows the same model.
 
 ```js
 const notFound = new NotFoundError('Your error message here.');
@@ -58,7 +58,7 @@ const badRequest = new BadRequestError('Your error message here.');
 
 ### TwiMLResponse
 
-There is an own response template to use with the TwiML format:
+There is a proper response template to use with the TwiML format:
 
 ```js
 const twimlVoice = new Twilio.twiml
@@ -82,7 +82,17 @@ npm install twilio-functions-utils
 
 ## Usage
 
-> **USE CONVENTIONAL FUNCTIONS** ➜ `Arrow functions didn't works as expected as 'this' can't be injected`.
+**IMPORTANT TO USE CONVENTIONAL FUNCTIONS** ➜
+
+```js
+  function yourFunctionName() {
+    // ...
+  }
+```
+
+`With arrow functions it doesn't work as expected as 'this' cannot be injected correctly.`.
+
+---
 
 ```js
 // File: assets/create.private.js
@@ -116,7 +126,6 @@ const { create } = require(Runtime.getAssets()['/create.js'].path)
  * cookies: Record<string, string>,
  * client: import('twilio').Twilio,
  * env: {
- *      TWILIO_WORKFLOW_SID: string,
  *      TWILIO_WORKFLOW_SID: string,
  *      DOMAIN_NAME: string
  * },
