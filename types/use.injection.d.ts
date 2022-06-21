@@ -1,22 +1,14 @@
 import { TwilioClient } from '@twilio-labs/serverless-runtime-types/types'
 
 export type Event = {
-    [key: string]: any,
-    request: Record<string, unknown>,
-    cookies: Record<string, string>,
+    request: Record<string, any>
+    cookies: Record<string, string>
     Token?: string
-}
-
-export type Providers = {
-    [key: string]: ProviderAction
 }
 
 export type Context = {
     getTwilioClient: () => TwilioClient,
-    [key: string]: any,
-    DOMAIN_NAME: string,
-    ACCOUNT_SID: string,
-    AUTH_TOKEN: string
+    [key: string]: Env
 }
 
 export type Env = {
@@ -26,27 +18,29 @@ export type Env = {
     AUTH_TOKEN: string
 }
 
-export interface ActionThis {
-    request: Record<string, unknown>
-    cookies: Record<string, unknown>
-    providers: Providers
+export type Providers = ProvidersThis
+export type ProvidersContext = Omit<Providers, 'client' | 'env'>
+
+export type Action<T> = (this: {
+        request: Record<string, any>,
+        cookies: Record<string, any>,
+        providers: Providers,
+        env: Env
+    }, event: T & Event) => Promise<any>    
+
+export type ProviderAction = (this: ProvidersThis, ...args: any) => Promise<any>
+
+export type ProvidersThis = {
+    client: TwilioClient,
     env: Env
+    [key: string]: ProviderAction
 }
-
-export interface ProviderActionThis {
-    client: TwilioClient
-    env: Env
-}
-
-export type Action = (this: ActionThis, event: Event) => Promise<unknown>
-
-export type ProviderAction = (this: ProviderActionThis, ...args: unknown[]) => Promise<unknown>
 
 export type InjectionOptions = {
-    providers: Providers,
+    providers: ProvidersContext,
     validateToken: boolean
 }
 
 export type TwilioFunction = (context: Context, event: Event, callback: import('@twilio-labs/serverless-runtime-types/types').ServerlessCallback) => Promise<void>
 
-export type UseInjection = (action: Action, options: InjectionOptions) => TwilioFunction
+export function useInjection<T>(action: Action<T>, options: InjectionOptions): TwilioFunction
