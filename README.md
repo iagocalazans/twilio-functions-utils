@@ -97,6 +97,16 @@ npm install twilio-functions-utils
 ```js
 // File: assets/create.private.js
 
+/**
+ * @param { object } event
+ * @this { {
+ * client: import('twilio').Twilio,
+ * env: {
+ *      TWILIO_WORKFLOW_SID: string,
+ *      DOMAIN_NAME: string
+ * } } }
+ * @returns { Promise<unknown> }
+ */
 exports.create = async function (event) {
   // Here you can acess  Twilio Client as client and Context as env (so you can get env vars).
   const { client, env } = this
@@ -120,11 +130,10 @@ const { useInjection, Response } = require('twilio-functions-utils');
 const { create } = require(Runtime.getAssets()['/create.js'].path)
 
 /**
- * @param { Record<string, unknown> } event
+ * @param { object } event
  * @this { {
- * request: Record<string, unknown>,
- * cookies: Record<string, string>,
- * client: import('twilio').Twilio,
+ * request: object,
+ * cookies: object,
  * env: {
  *      TWILIO_WORKFLOW_SID: string,
  *      DOMAIN_NAME: string
@@ -136,7 +145,7 @@ const { create } = require(Runtime.getAssets()['/create.js'].path)
  */
 async function createAction(event) {
   // You can perform all your "controller" level actions, as you have access to the request headers and cookies.
-  const { cookies, request, client, env } = this
+  const { cookies, request, env } = this
 
   // Then just call the providers you provided to handler by using useInjection.
   const providerResult = await this.providers.create(event)
