@@ -8,7 +8,7 @@ export type Event = {
 }
 
 export type Providers = {
-    [key: string]: AsyncFunction
+    [key: string]: ProviderAction
 }
 
 export type Context = {
@@ -33,7 +33,14 @@ export interface ActionThis {
     env: Env
 }
 
+export interface ProviderActionThis {
+    client: TwilioClient
+    env: Env
+}
+
 export type Action = (this: ActionThis, event: Event) => Promise<unknown>
+
+export type ProviderAction = (this: ProviderActionThis, ...args: unknown[]) => Promise<unknown>
 
 export type InjectionOptions = {
     providers: Providers,
