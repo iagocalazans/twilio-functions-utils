@@ -1,4 +1,4 @@
-const { useInjection } = require('./lib/use.injection');
+const { useInjection, typeOf } = require('./lib/use.injection');
 const { BadRequestError } = require('./lib/errors/bad-request.error');
 const { InternalServerError } = require('./lib/errors/internal-server.error');
 const { NotFoundError } = require('./lib/errors/not-found.error');
@@ -12,4 +12,5 @@ module.exports = {
   InternalServerError,
   NotFoundError,
   TwiMLResponse,
+  typeOf,
 };
