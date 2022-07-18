@@ -162,6 +162,63 @@ exports.handler = useInjection(createAction, {
 });
 ```
 
+## Testing with `useMock`
+
+The Twilio Serverless structure make it hard for testing sometimes. So this provides a method that works perfectly with useInjection ready functions. The `useMock` act like useInjection but mocking some required fragments as `getAssets` and `getFunctions`.
+
+Exports your function:
+
+```js
+async function functionToBeTested(event) {
+  const something = await this.providers.myCustomProvider(event)
+  return Response(something)
+}
+
+exports.handler = useInjection(functionToBeTested, {
+  providers: {
+    myCustomProvider,
+  },
+});
+
+module.exports = { functionToBeTested }; // <--
+```
+
+You always need to import the twilio.mock for Response Twilio Global object on your testing files begining. **(Required)**
+
+```js
+require('twilio-functions-utils/lib/twilio.mock');
+```
+
+Use Twilio Functions Utils `useMock` to do the hard job and just write your tests with the generated function.
+
+```js
+/* global describe, it, expect */
+
+require('twilio-functions-utils/lib/twilio.mock');
+
+const { useMock, Response } = require('twilio-functions-utils');
+const { functionToBeTested } = require('../../functions/functionToBeTested'); // <-- Import here!
+
+// Create the test function from the function to be tested
+const fn = useMock(functionToBeTested, {
+  providers: {
+    myCustomProvider: async (sid) => ({ sid }), // Mock the providers implementation.
+  },
+});
+
+describe('Function functionToBeTested', () => {
+  it('if {"someValue": true}', async () => {
+    const request = { TaskSid: '1234567', TaskAttributes: '{"someValue": true}' };
+
+    const res = await fn(request);
+
+    expect(res).toBeInstanceOf(Response);
+    expect(res.body).not.toEqual(request);
+    expect(res.body).toEqual({ sid: '1234567' });
+  });
+});
+```
+
 ## Author
 
 - [Iago Calazans](https://github.com/iagocalazans) - 🛠 Senior Node.js Engineer at [Stone](https://www.stone.com.br/)
