@@ -166,6 +166,25 @@ exports.handler = useInjection(createAction, {
 
 The Twilio Serverless structure make it hard for testing sometimes. So this provides a method that works perfectly with useInjection ready functions. The `useMock` act like useInjection but mocking some required fragments as `getAssets` and `getFunctions`.
 
+>
+
+```
+Your files structures must be as:
+
+| /root
+| - package.json
+| - src
+| -- functions
+| -- assets|
+
+or:
+
+| /root
+| - package.json
+| - functions
+| - assets
+```
+
 Exports your function:
 
 ```js
@@ -174,13 +193,13 @@ async function functionToBeTested(event) {
   return Response(something)
 }
 
-exports.handler = useInjection(functionToBeTested, {
+const handler = useInjection(functionToBeTested, {
   providers: {
     myCustomProvider,
   },
 });
 
-module.exports = { functionToBeTested }; // <--
+module.exports = { functionToBeTested, handler }; // <--
 ```
 
 You always need to import the twilio.mock for Response Twilio Global object on your testing files begining. **(Required)**
