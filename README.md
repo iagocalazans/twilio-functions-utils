@@ -82,7 +82,7 @@ npm install twilio-functions-utils
 
 ## Usage
 
-**IMPORTANT TO USE CONVENTIONAL FUNCTIONS** ➜
+**IMPORTANT TO USE REGULAR FUNCTIONS** ➜
 
 ```js
   function yourFunctionName() {
@@ -175,7 +175,7 @@ Your files structures must be as:
 | - package.json
 | - src
 | -- functions
-| -- assets|
+| -- assets
 
 or:
 
