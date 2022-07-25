@@ -92,8 +92,6 @@ npm install twilio-functions-utils
 
 `With arrow functions it doesn't work as expected as 'this' cannot be injected correctly.`.
 
----
-
 ```js
 // File: assets/create.private.js
 
@@ -166,23 +164,35 @@ exports.handler = useInjection(createAction, {
 
 The Twilio Serverless structure make it hard for testing sometimes. So this provides a method that works perfectly with useInjection ready functions. The `useMock` act like useInjection but mocking some required fragments as `getAssets` and `getFunctions`.
 
->
+**(Required)** Set your `jest` testing script with `NODE_ENV=test`:
 
 ```
+"scripts": {
+    "test": "NODE_ENV=test jest --collect-coverage --watchAll",
+    "start": "twilio-run",
+    "deploy": "twilio-run deploy"
+  }
+```
+
 Your files structures must be as:
 
-| /root
-| - package.json
-| - src
-| -- functions
-| -- assets
+```
+app/
+├─ package.json
+├─ node_modules/
+├─ src/
+│  ├─ functions/
+│  ├─ assets/
+```
 
 or:
 
-| /root
-| - package.json
-| - functions
-| - assets
+```
+app/
+├─ package.json
+├─ functions/
+├─ assets/
+├─ node_modules/
 ```
 
 Exports your function:
@@ -202,7 +212,7 @@ const handler = useInjection(functionToBeTested, {
 module.exports = { functionToBeTested, handler }; // <--
 ```
 
-You always need to import the twilio.mock for Response Twilio Global object on your testing files begining. **(Required)**
+**(Required)** You always need to import the `twilio.mock` for Response Twilio Global object on your testing files begining.
 
 ```js
 require('twilio-functions-utils/lib/twilio.mock');
