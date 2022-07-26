@@ -44,3 +44,5 @@ export type InjectionOptions = {
 export type TwilioFunction = (context: Context, event: Event, callback: import('@twilio-labs/serverless-runtime-types/types').ServerlessCallback) => Promise<void>
 
 export function useInjection<T>(action: Action<T>, options: InjectionOptions): TwilioFunction
+
+export function typeOf(value: any): string
