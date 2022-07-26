@@ -9,10 +9,10 @@ const { TwiMLResponse } = require('./lib/responses/twiml.response');
 module.exports = {
   useMock,
   useInjection,
+  typeOf,
   Response,
   BadRequestError,
   InternalServerError,
   NotFoundError,
   TwiMLResponse,
-  typeOf,
 };
