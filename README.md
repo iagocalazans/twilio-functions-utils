@@ -5,6 +5,8 @@
 
 ## About
 
+![npm](https://img.shields.io/npm/v/twilio-functions-utils?color=white&label=version&logo=npm&style=for-the-badge) ![npm](https://img.shields.io/npm/dw/twilio-functions-utils?color=white&logo=npm&style=for-the-badge) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/iagocalazans/twilio-functions-utils?color=white&logo=github&style=for-the-badge) ![GitHub issues](https://img.shields.io/github/issues/iagocalazans/twilio-functions-utils?color=white&logo=github&style=for-the-badge)
+
 This lib was created with the aim of simplifying the use of serverless Twilio, reducing the need to apply frequent try-catches and improving context management, making it no longer necessary to return the callback() method in all functions.
 
 ## How it works
