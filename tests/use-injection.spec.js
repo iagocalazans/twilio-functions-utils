@@ -11,6 +11,7 @@ const {
   TwiMLResponse,
   NotFoundError,
 } = require('../index');
+const { UnauthorizedError } = require('../lib/errors/unauthorized.error');
 
 describe('Function typeOf', () => {
   it('Should return Array', () => {
@@ -55,11 +56,12 @@ describe('Function typeOf', () => {
 });
 
 const responseTypes = {
-  twiml: () => new TwiMLResponse(),
+  twiml: (provided) => new TwiMLResponse(provided.twiml),
   badRequest: () => new BadRequestError(),
   internalServer: () => new InternalServerError(),
   notFound: () => new NotFoundError(),
   response: (provided) => new Response(provided),
+  responseAsString: (provided) => new Response(provided.message),
 };
 
 function useItToMock(event) {
@@ -89,6 +91,13 @@ const fn = useInjection(useItToMock, {
   },
 });
 
+const fnWithToken = useInjection(useItToMock, {
+  providers: {
+    useItAsProvider,
+  },
+  validateToken: true,
+});
+
 const twilioContext = {
   getTwilioClient() {
 
@@ -102,6 +111,17 @@ const twilioCallback = function (err, response) {
 
   return response;
 };
+
+function VoiceResponse() {
+  this.body = 'Response';
+
+  this.toString = () => this.body;
+}
+function VoiceXmlTag() {
+  this.body = '<?xml version="1.0" encoding="UTF-8"?><Response />';
+
+  this.toString = () => this.body;
+}
 
 describe('Function useInjection', () => {
   it('Should respond with an InternalServerError Instance', async () => {
@@ -120,6 +140,30 @@ describe('Function useInjection', () => {
     expect(callback).toBeInstanceOf(TwiMLResponse);
     expect(callback.body).toEqual('<?xml version="1.0" encoding="UTF-8"?><Response />');
   });
+  it('Should respond with a TwiMLResponse Instance even if receives an Invalid Object', async () => {
+    const callback = await fn(
+      twilioContext, { type: 'twiml', twiml: {} }, twilioCallback,
+    );
+
+    expect(callback).toBeInstanceOf(TwiMLResponse);
+    expect(callback.body).toEqual('<?xml version="1.0" encoding="UTF-8"?><Response />');
+  });
+  it('Should respond with a TwiMLResponse Instance even if receives a valid TwimlResponse Object without the xml tag', async () => {
+    const callback = await fn(
+      twilioContext, { type: 'twiml', twiml: new VoiceResponse() }, twilioCallback,
+    );
+
+    expect(callback).toBeInstanceOf(TwiMLResponse);
+    expect(callback.body).toEqual('<?xml version="1.0" encoding="UTF-8"?><Response />');
+  });
+  it('Should respond with a TwiMLResponse Instance even if receives a valid TwimlResponse Object', async () => {
+    const callback = await fn(
+      twilioContext, { type: 'twiml', twiml: new VoiceXmlTag() }, twilioCallback,
+    );
+
+    expect(callback).toBeInstanceOf(TwiMLResponse);
+    expect(callback.body).toEqual('<?xml version="1.0" encoding="UTF-8"?><Response />');
+  });
   it('Should respond with a Response Instance', async () => {
     const callback = await fn(
       twilioContext, { type: 'response' }, twilioCallback,
@@ -127,6 +171,14 @@ describe('Function useInjection', () => {
 
     expect(callback).toBeInstanceOf(Response);
     expect(callback.body).toEqual({ evaluated: true, type: 'response' });
+  });
+  it('Should respond with a Response as String Instance', async () => {
+    const callback = await fn(
+      twilioContext, { type: 'responseAsString', message: 'My message!' }, twilioCallback,
+    );
+
+    expect(callback).toBeInstanceOf(Response);
+    expect(callback.body).toEqual('My message!');
   });
   it('Should respond with a BadRequestError Instance', async () => {
     const callback = await fn(
@@ -151,5 +203,13 @@ describe('Function useInjection', () => {
 
     expect(callback).toBeInstanceOf(InternalServerError);
     expect(callback.body).toEqual('[ InternalServerError ]: The server encountered an unexpected condition that prevented it from fulfilling the request!');
+  });
+  it('Should respond with a UnauthorizedError Instance', async () => {
+    const callback = await fnWithToken(
+      twilioContext, { type: 'response' }, twilioCallback,
+    );
+
+    expect(callback).toBeInstanceOf(UnauthorizedError);
+    expect(callback.body).toEqual('[ UnauthorizedError ]: Unauthorized: Token was not provided');
   });
 });
