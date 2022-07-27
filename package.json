@@ -8,7 +8,8 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "jest --watchAll --collect-coverage"
+    "test": "jest --watchAll --collect-coverage",
+    "coveralls": "jest --coverage && coveralls < coverage/lcov.info"
   },
   "repository": {
     "type": "git",
@@ -53,6 +54,7 @@
   },
   "devDependencies": {
     "@twilio-labs/serverless-runtime-types": "^2.2.3",
+    "coveralls": "^3.1.1",
     "eslint": "^8.14.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
