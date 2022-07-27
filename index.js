@@ -1,4 +1,5 @@
-const { useInjection, typeOf } = require('./lib/use.injection');
+const { useInjection } = require('./lib/use.injection');
+const { typeOf } = require('./lib/type-of');
 const { useMock } = require('./lib/use.mock');
 const { BadRequestError } = require('./lib/errors/bad-request.error');
 const { InternalServerError } = require('./lib/errors/internal-server.error');
