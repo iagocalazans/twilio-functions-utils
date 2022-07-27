@@ -45,4 +45,6 @@ export type TwilioFunction = (context: Context, event: Event, callback: import('
 
 export function useInjection<T>(action: Action<T>, options: InjectionOptions): TwilioFunction
 
+export function useMock<T>(action: Action<T>, options: InjectionOptions): TwilioFunction
+
 export function typeOf(value: any): string
