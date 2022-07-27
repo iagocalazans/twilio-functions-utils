@@ -2,3 +2,6 @@
 jest.config.js
 .eslintrc.js
 .gitignore
+tests/
+assets/
+functions/
