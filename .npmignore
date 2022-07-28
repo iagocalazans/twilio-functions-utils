@@ -5,3 +5,5 @@ jest.config.js
 tests/
 assets/
 functions/
+coverage/
+.travis.yml
