@@ -8,8 +8,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "jest --watchAll --collect-coverage",
-    "coveralls": "jest --coverage && coveralls < coverage/lcov.info"
+    "test": "jest --coverage && coveralls < coverage/lcov.info",
   },
   "repository": {
     "type": "git",
