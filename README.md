@@ -5,7 +5,7 @@
 
 ## About
 
-![npm](https://img.shields.io/npm/v/twilio-functions-utils?color=white&label=version&logo=npm&style=for-the-badge) ![npm](https://img.shields.io/npm/dw/twilio-functions-utils?color=white&logo=npm&style=for-the-badge) ![npms.io (final)](https://img.shields.io/npms-io/final-score/twilio-functions-utils?color=white&label=overall%20score&logo=npm&logoColor=white&style=for-the-badge) [![DeepScan grade](https://img.shields.io/badge/Deepscan-Good-white?style=for-the-badge&logo=Deepnote&logoColor=white)](https://deepscan.io/dashboard#view=project&tid=17597&pid=21796&bid=633881) 
+![npm](https://img.shields.io/npm/v/twilio-functions-utils?color=white&label=version&logo=npm&style=for-the-badge) ![npm](https://img.shields.io/npm/dw/twilio-functions-utils?color=white&logo=npm&style=for-the-badge) ![npms.io (final)](https://img.shields.io/npms-io/final-score/twilio-functions-utils?color=white&label=overall%20score&logo=npm&logoColor=white&style=for-the-badge) ![Coveralls](https://img.shields.io/coveralls/github/iagocalazans/twilio-functions-utils?color=white&logo=coveralls&style=for-the-badge)
 
 
 
