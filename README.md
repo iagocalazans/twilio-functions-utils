@@ -1,25 +1,25 @@
 
 # Twilio Functions Utils
 
-<img src="https://avatars.githubusercontent.com/u/109142?s=200&v=4" width="100" />
+<img src="https://avatars.githubusercontent.com/u/109142?s=200&v=4" width="80" />
 
-## About
+## ABOUT
 
-![npm](https://img.shields.io/npm/v/twilio-functions-utils?color=white&label=version&logo=npm&style=for-the-badge) ![npm](https://img.shields.io/npm/dw/twilio-functions-utils?color=white&logo=npm&style=for-the-badge) ![npms.io (final)](https://img.shields.io/npms-io/final-score/twilio-functions-utils?color=white&label=overall%20score&logo=npm&logoColor=white&style=for-the-badge) ![Coveralls](https://img.shields.io/coveralls/github/iagocalazans/twilio-functions-utils?color=white&logo=coveralls&style=for-the-badge)
+![npm](https://img.shields.io/npm/v/twilio-functions-utils?color=white&label=version&logo=npm&style=for-the-badge) ![npm](https://img.shields.io/npm/dw/twilio-functions-utils?color=white&logo=npm&style=for-the-badge) ![npms.io (final)](https://img.shields.io/npms-io/final-score/twilio-functions-utils?color=white&label=score&logo=npm&logoColor=white&style=for-the-badge) ![Coveralls](https://img.shields.io/coveralls/github/iagocalazans/twilio-functions-utils?color=white&logo=coveralls&style=for-the-badge)
 
 This lib was created with the aim of simplifying the use of serverless Twilio, reducing the need to apply frequent try-catches and improving context management, making it no longer necessary to return the callback() method in all functions.
 
-## Install
+### Install
 
 ```cmd
 npm install twilio-functions-utils
 ```
 
-## How it works
+## HOW IT WORKS
 
 The lib provides a function `useInjection` who returns a brand function for every execution. This returned function is ready to receive the Twilio Handler arguments and make them available as `this`  properties as `this.request`, `this.cookies` and `this.env` at the Function level and `this.client` and `this.env` at the Provider function level.
 
-### `useInjection(Function, Options)` <sup><sub>Function</sub></sup>
+### # useInjection(Function, Options) <sup><sub>Function</sub></sup>
 
 The useInjection method takes two parameters. The first to apply as a handler and the last is an object of configuration options.
 
@@ -178,9 +178,9 @@ exports.handler = useInjection(createAction, {
 });
 ```
 
-## Extras
+## EXTRAS
 
-### `typeOf(Value)` <sup><sub>Function</sub></sup>
+### # typeOf(Value) <sup><sub>Function</sub></sup>
 
 A simple method to discovery a value type. This is more specific then the original JavaScript `typeof`.
 
@@ -204,9 +204,9 @@ console.log(typeArray) // Array
 console.log(original) // object
 ```
 
-## Testing
+## TESTING
 
-### `useMock(Function, Options)` <sup><sub>Function</sub></sup>
+### # useMock(Function, Options) <sup><sub>Function</sub></sup>
 
 The Twilio Serverless structure make it hard for testing sometimes. So this provides a method that works perfectly with useInjection ready functions. The `useMock` act like useInjection but mocking some required fragments as `getAssets` and `getFunctions`.
 
@@ -304,6 +304,6 @@ describe('Function functionToBeTested', () => {
 });
 ```
 
-## Author
+## AUTHOR
 
 - [Iago Calazans](https://github.com/iagocalazans) - 🛠 Senior Node.js Engineer at [Stone](https://www.stone.com.br/)

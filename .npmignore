@@ -7,3 +7,4 @@ assets/
 functions/
 coverage/
 .travis.yml
+.env
