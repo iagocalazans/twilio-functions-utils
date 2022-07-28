@@ -39,8 +39,6 @@ An object that can contain providers that will be defined, which act as use case
 
 ##### [useInjection] Options.validateToken <sup><sub>Boolean</sub></sup>
 
-###### Twilio Flex Token Validator
-
 You can pass `validateToken` equal true to force Flex Token validation using [Twilio Flex Token Validator](https://github.com/twilio/twilio-flex-token-validator)
 
 ```js
