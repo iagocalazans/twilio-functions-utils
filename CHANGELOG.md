@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.2.2] - 2022-08-08
+
+### Changed
+
+- refactor(*): :label: Fix types for TS [888b9a0a8806047e51f2c39e1bff135a8c752279] @iagocalazans
+
 ## [2.2.1] - 2022-08-05
 
 ### Changed
@@ -25,5 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - docs(*): Incrementing README description [d1d2e79eddedc9478e5bac5baab5207f740c741b] @iagocalazans
 
 [Released]: https://github.com/iagocalazans/twilio-functions-utils/compare/v2.2.0...HEAD
+[2.2.2]: https://github.com/iagocalazans/twilio-functions-utils/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/iagocalazans/twilio-functions-utils/compare/v2.2.0...v2.2.1
-[2.2.0]: https://github.com/iagocalazans/twilio-functions-utils/compare/v2.1.0...v2.2.0
+[2.2.0]: https://github.com/iagocalazans/twilio-functions-utils/compare/v1.0.0...v2.2.0

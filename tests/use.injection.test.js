@@ -45,6 +45,7 @@ function useItAsProvider(event) {
 const fn = useInjection(useItToMock, {
   providers: {
     useItAsProvider,
+
   },
 });
 
