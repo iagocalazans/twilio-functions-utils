@@ -3,7 +3,7 @@
   "version": "2.2.1",
   "description": "Twilio Functions utils library",
   "main": "index.js",
-  "types": "./types/use.injection.d.ts",
+  "types": "./types/twilio-functions-utils",
   "directories": {
     "lib": "lib"
   },
