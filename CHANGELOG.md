@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.2.3] - 2022-08-09
+
+### Added
+
+- chore(*): :white_check_mark: Added more test cases for useMock function [98b1f9a9ee253a35bd33d0a74de65c5c794cae7a] @iagocalazans
+
 ## [2.2.2] - 2022-08-08
 
 ### Changed
