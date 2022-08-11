@@ -287,6 +287,12 @@ const fn = useMock(functionToBeTested, {
   providers: {
     myCustomProvider: async (sid) => ({ sid }), // Mock the providers implementation.
   },
+  env: {
+    YOUR_ENV_VAR: 'value'
+  },
+  client: {
+    functionToMock: {}
+  }
 });
 
 describe('Function functionToBeTested', () => {
@@ -300,6 +306,12 @@ describe('Function functionToBeTested', () => {
     expect(res.body).toEqual({ sid: '1234567' });
   });
 });
+```
+
+You can mock your getSync map items fetch results with `setMapItemFetchResolvedValue`:
+
+```js
+Runtime.getSync().maps().setMapItemFetchResolvedValue( <object> );
 ```
 
 ## AUTHOR
