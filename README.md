@@ -308,10 +308,10 @@ describe('Function functionToBeTested', () => {
 });
 ```
 
-You can mock your getSync map items fetch results with `setMapItemFetchResolvedValue`:
+You can mock your getSync map items fetch results with `setMapItemFetchResolvedValue` as follow
 
 ```js
-Runtime.getSync().maps().setMapItemFetchResolvedValue( <object> );
+await Runtime.getSync().maps().syncMapItems.setMapItemFetchResolvedValue( <object> );
 ```
 
 ## AUTHOR
