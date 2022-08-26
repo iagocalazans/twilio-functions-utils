@@ -1,6 +1,14 @@
-/* global describe, it, expect */
+/* global describe, it, expect, jest */
 
 require('../lib/twilio.mock');
+
+const tokenValidator = require('twilio-flex-token-validator');
+
+jest.mock('twilio-flex-token-validator');
+
+const token = jest.spyOn(tokenValidator, 'validator');
+
+token.mockResolvedValue({ valid: false });
 
 const {
   useInjection,
@@ -61,6 +69,7 @@ const twilioContext = {
 
   },
   DOMAIN_NAME: 'https://localhost:3000',
+  ACCOUNT_SID: '',
 };
 const twilioCallback = function (err, response) {
   if (err) {
@@ -163,6 +172,15 @@ describe('Function useInjection', () => {
     expect(callback.body).toEqual('[ InternalServerError ]: The server encountered an unexpected condition that prevented it from fulfilling the request!');
   });
   it('Should respond with a UnauthorizedError Instance', async () => {
+    const callback = await fnWithToken(
+      twilioContext, { type: 'response', Token: 'fake-token' }, twilioCallback,
+    );
+
+    expect(callback).toBeInstanceOf(UnauthorizedError);
+    expect(callback.body).toEqual('[ UnauthorizedError ]: The received request could not be verified!');
+  });
+  it('Should respond with a UnauthorizedError Instance', async () => {
+    token.mockRejectedValue('Unauthorized: Token was not provided');
     const callback = await fnWithToken(
       twilioContext, { type: 'response' }, twilioCallback,
     );

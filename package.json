@@ -8,7 +8,8 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "jest --coverage && coveralls < coverage/lcov.info"
+    "test": "jest --coverage && coveralls < coverage/lcov.info",
+    "lint": "eslint --fix index.js lib/"
   },
   "repository": {
     "type": "git",

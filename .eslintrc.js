@@ -17,5 +17,7 @@ module.exports = {
     'valid-typeof': 0,
     'func-names': ['error', 'never'],
     'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    'no-param-reassign': 0,
+    'no-constructor-return': 0,
   },
 };

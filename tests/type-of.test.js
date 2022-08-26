@@ -42,6 +42,6 @@ describe('Function typeOf', () => {
     expect(typeOf(class MyClass {})).toEqual('Function');
   });
   it('Should return Function', () => {
-    expect(typeOf(function MyFunction() {})).toEqual('Function'); //eslint-disable-line
+    expect(typeOf(() => {})).toEqual('Function');
   });
 });
