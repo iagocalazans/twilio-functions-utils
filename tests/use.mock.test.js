@@ -90,8 +90,10 @@ describe('Function useMock', () => {
   it('Should find paths for getFunctions and getAssets', async () => {
     expect(fsCalls).toHaveBeenCalled();
 
-    expect(Runtime.getFunctions()['use-to-test'].path).toBe('/home/iagocalazans/personal/twilio-functions-utils/functions/use-to-test');
-    expect(Runtime.getAssets()['/use-to-test.js'].path).toBe('/home/iagocalazans/personal/twilio-functions-utils/assets/use-to-test');
+    expect(Runtime.getFunctions()['use-to-test'].path).toBe(`${process.cwd()
+    }/functions/use-to-test`);
+    expect(Runtime.getAssets()['/use-to-test.js'].path).toBe(`${process.cwd()
+    }/assets/use-to-test`);
   });
 
   it('Should throw an error while creating a map without uniqueName', async () => {
