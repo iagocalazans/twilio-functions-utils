@@ -12,6 +12,7 @@ const {
   Response,
   TwiMLResponse,
   NotFoundError,
+  UnauthorizedError,
 } = require('../index');
 
 const responseTypes = {
@@ -31,6 +32,10 @@ function useItToMock(event) {
 
   if (event.forceFail) {
     throw new Error('Check fail condition!');
+  }
+
+  if (event.forceUnauthorized) {
+    throw 'forceUnauthorized condition!';
   }
 
   const reprovided = this.providers
@@ -85,6 +90,13 @@ describe('Function useMock', () => {
 
     expect(callback).toBeInstanceOf(Response);
     expect(callback.body).toEqual({ evaluated: true, forceFail: false, type: 'response' });
+  });
+
+  it('Should respond with an UnauthorizedError Instance', async () => {
+    const callback = await fn({ type: 'response', forceFail: false, forceUnauthorized: true });
+
+    expect(callback).toBeInstanceOf(UnauthorizedError);
+    expect(callback.body).toMatch('[ UnauthorizedError ]: forceUnauthorized condition!');
   });
 
   it('Should find paths for getFunctions and getAssets', async () => {
