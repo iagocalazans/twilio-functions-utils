@@ -7,23 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
-## [2.2.3] - 2022-08-09
+## [2.3.0] - 2022-08-29
 
 ### Added
 
-- chore(*): :white_check_mark: Added more test cases for useMock function [98b1f9a9ee253a35bd33d0a74de65c5c794cae7a] @iagocalazans
+- feat(*): ✨ feat the new Result class [b4e24152d1bfc389e9222ab6f5e2206008ec63c3] @iagocalazans
 
-## [2.2.2] - 2022-08-08
+### Tested
 
-### Changed
-
-- refactor(*): :label: Fix types for TS [888b9a0a8806047e51f2c39e1bff135a8c752279] @iagocalazans
-
-## [2.2.1] - 2022-08-05
+- test(*): ✅ Test almost 100% [2bf590597527aa101b869cbd3ba545bfa227d29a] @iagocalazans
 
 ### Changed
 
-- fix(*): :bug: Fix limited useMock customizations [35cac5d1ce7c67a679362a8afbf11fffd04ddafd] @iagocalazans
+- fix: exporting unauthorized error [f155a00070312c61792022502b263748552001bb] @iagocalazans
+- fix: fixed syncMapItems Resolved value error [c7c35c9a962b9ba62236db9a6786e4efa3abe3ba] @iagocalazans
+- fix: made catch similar to original injection [4b639dca7d41cbdc09abf129c053b2fc768900b3] @iagocalazans
+- fix: 🐛 Fix client mock and improving Sync capabilities [e8ecf5fafb7ff9d2aab347730bf73940aa701290] @iagocalazans
+- fix(*): 🐛 Fix limited useMock customizations [35cac5d1ce7c67a679362a8afbf11fffd04ddafd] @iagocalazans
 
 ## [2.2.0] - 2022-08-03
 
@@ -36,8 +36,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - docs(*): Incrementing README description [d1d2e79eddedc9478e5bac5baab5207f740c741b] @iagocalazans
 
-[Released]: https://github.com/iagocalazans/twilio-functions-utils/compare/v2.2.0...HEAD
-[2.2.3]: https://github.com/iagocalazans/twilio-functions-utils/compare/v2.2.2...v2.2.3
-[2.2.2]: https://github.com/iagocalazans/twilio-functions-utils/compare/v2.2.1...v2.2.2
-[2.2.1]: https://github.com/iagocalazans/twilio-functions-utils/compare/v2.2.0...v2.2.1
+[Released]: https://github.com/iagocalazans/twilio-functions-utils/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/iagocalazans/twilio-functions-utils/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/iagocalazans/twilio-functions-utils/compare/v1.0.0...v2.2.0
