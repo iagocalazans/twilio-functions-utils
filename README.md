@@ -109,21 +109,18 @@ Separate your actions from the main routine of the code. Break it down into seve
 ```js
 // File: assets/create.private.js
 
+const { Result } = require('twilio-functions-utils');
+
 /**
+ * Here you can acess  Twilio Client as client and Context as env (so you can get env vars).
+ * 
+ * @function
  * @param { object } event
- * @this { {
- * client: import('twilio').Twilio,
- * env: {
- *      TWILIO_WORKFLOW_SID: string,
- *      DOMAIN_NAME: string
- * } } }
- * @returns { Promise<unknown> }
  */
 exports.create = async function (event) {
-  // Here you can acess  Twilio Client as client and Context as env (so you can get env vars).
   const { client, env } = this
 
-  return new Promise((resolve, reject) => {
+  return Result.ok(await new Promise((resolve, reject) => {
     const random = Math.random();
 
     if (random >= 0.5) {
@@ -131,7 +128,7 @@ exports.create = async function (event) {
     }
   
     return reject(new Error('Unresolved'));
-  });
+  }));
 };
 ```
 
@@ -144,28 +141,34 @@ const { useInjection, Response } = require('twilio-functions-utils');
 const { create } = require(Runtime.getAssets()['/create.js'].path)
 
 /**
+ * @typedef { object } CreateActionThis
+ * 
+ * @property { object } request
+ * @property { object } cookies
+ * @property { object } env
+ * @property { string } env.DOMAIN_NAME
+ * @property { object } providers
+ * @property { create } providers.create
+ */
+
+/**
+ * You can perform all your "controller" level actions, as you have access to the request headers and cookies.
+ * Then just call the providers you provided to handler by using useInjection.
+ * Just put it on a Response object and you are good to go!
+ * 
+ * @function
  * @param { object } event
- * @this { {
- * request: object,
- * cookies: object,
- * env: {
- *      TWILIO_WORKFLOW_SID: string,
- *      DOMAIN_NAME: string
- * },
- * providers: {
- *      create: create,
- * } } }
- * @returns { Promise<unknown> }
+ * @this CreateActionThis
  */
 async function createAction(event) {
-  // You can perform all your "controller" level actions, as you have access to the request headers and cookies.
   const { cookies, request, env } = this
-
-  // Then just call the providers you provided to handler by using useInjection.
   const providerResult = await this.providers.create(event)
 
-  // Just put it on a Response object and you are good to go!
-  return new Response(providerResult, 201);
+  if (providerResult.isError) {
+    return new BadRequestError(providerResult.error);
+  }
+
+  return new Response(providerResult.data, 201);
 }
 
 exports.handler = useInjection(createAction, {
