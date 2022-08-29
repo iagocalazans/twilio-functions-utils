@@ -35,6 +35,7 @@ function useItToMock(event) {
   }
 
   if (event.forceUnauthorized) {
+    // eslint-disable-next-line no-throw-literal
     throw 'forceUnauthorized condition!';
   }
 

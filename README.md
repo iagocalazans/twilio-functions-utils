@@ -205,6 +205,59 @@ console.log(typeArray) // Array
 console.log(original) // object
 ```
 
+### # Result <sup><sub>Class</sub></sup>
+
+The Result class provides an organized and simple way to return errors without having to wrap every request in Try Catches.
+
+#### Methods
+
+##### Result.ok(data)
+
+Use the `.ok` method to create a new Result instance with a data property and isError `false`.
+
+###### [Result.ok] data <sup><sub>*</sub></sup>
+
+The data value could be of any of the primitives types that javascript accpets.
+
+##### Result.failed(error)
+
+Use the `.failed` method to create a new Result instance with an error property and isError `true`.
+
+###### [Result.failed] error <sup><sub>(Error|*)</sub></sup>
+
+The data value must be preferably of Error type, but you can use any of the primitive ones...
+
+#### Properties
+
+##### Result.isError
+
+A boolean propety that return true when Result contain a defined error value.
+
+##### Result.data
+
+The successfully returned value.
+
+##### Result.error
+
+An Error like object throwed by the "action" as result.
+
+#### Usage
+
+```js
+const result = Result.ok(value);
+// or
+const result = Result.ok(await value);
+// or
+const result = Result.failed(error);
+
+
+if (result.isError) {
+  return new BadRequestError(result.error)
+}
+
+return new Response(result.data)
+```
+
 ## TESTING
 
 ### # useMock(Function, Options) <sup><sub>Function</sub></sup>
