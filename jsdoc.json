@@ -16,14 +16,14 @@
         "monospaceLinks": false,
         "search": true,
         "better-docs": {
-            "name": "Twilio Functions Utils - Docs",
+            "name": "Twilio Functions Utils",
             "navLinks": [
                 {
                     "label": "Github",
                     "href": "https://github.com/iagocalazans/twilio-functions-utils"
                 },
                 {
-                    "label": "NPM Package",
+                    "label": "npm",
                     "href": "https://www.npmjs.com/package/twilio-functions-utils"
                 }
             ]
