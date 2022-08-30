@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,7 +5,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title> responses/twiml.response.js</title>
+  <title> UnauthorizedError</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -92,68 +90,222 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-_Twilio.Response_.html">Twilio.Response</a></li></ul><h3>Classes</h3><ul><li><a href="Response.html">Response</a></li><li><a href="Result.html">Result</a></li><li><a href="TwiMLResponse.html">TwiMLResponse</a></li></ul><h3>Global</h3><ul><li><a href="global.html#typeOf">typeOf</a></li><li><a href="global.html#useInjection">useInjection</a></li><li><a href="global.html#useMock">useMock</a></li></ul></div>
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-_Twilio.Response_.html">Twilio.Response</a></li></ul><h3>Classes</h3><ul><li><a href="BadRequestError.html">BadRequestError</a></li><li><a href="InternalServerError.html">InternalServerError</a></li><li><a href="NotFoundError.html">NotFoundError</a></li><li><a href="Response.html">Response</a></li><li><a href="Result.html">Result</a></li><li><a href="TwiMLResponse.html">TwiMLResponse</a></li><li><a href="UnauthorizedError.html">UnauthorizedError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#typeOf">typeOf</a></li><li><a href="global.html#useInjection">useInjection</a></li><li><a href="global.html#useMock">useMock</a></li></ul></div>
                 
             </nav>
         </div>
         <div class="core" id="main-content-wrapper">
             <div class="content">
                 <header class="page-title">
-                    <p>Source</p>
-                    <h1>responses/twiml.response.js</h1>
+                    <p>Class</p>
+                    <h1>UnauthorizedError</h1>
                 </header>
                 
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/* global Twilio */
+        <h2><span class="attribs"><span class="type-signature"></span></span>UnauthorizedError<span class="signature">(body)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description"><p>This just like the <code>InternalServerError</code> is used inside of the <code>useInjection</code> mechanics every time you request for Token validation</p></div>
+        
+    
+</header>
 
-/**
- * The TwiMLResponse is the must return value on your CustomFn when you should return a Twilio TwiML.
- *
- * @class
- *
- * @extends { external:"Twilio.Response" }
- */
-class TwiMLResponse extends Twilio.Response {
-  /**
-   * @param {(string|object)} body You can pass a string or a VoiceResponse object
-   * @param {number} statusCode
-   * @returns {TwiMLResponse}
-   */
-  constructor(body = '&lt;?xml version="1.0" encoding="UTF-8"?>&lt;Response />', statusCode = 200) {
-    super({ statusCode, body });
+<article>
+    <div class="container-overview">
+    
+        
+            <div class='vertical-section'>
+                <div class="members">
+                    <div class="member">
+                        <div class=name>
+                            <span class="tag">Constructor</span>
+                        </div>
+                        
 
-    this.appendHeader('Access-Control-Allow-Origin', '*');
-    this.appendHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
-    this.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
-    this.appendHeader('Content-Type', 'application/xml');
 
-    if (typeof body !== 'string') {
-      const stringBody = body.toString();
+    
+    <h4 class="name" id="UnauthorizedError">
+        <a class="href-link" href="#UnauthorizedError">#</a>
+        
+        <span class="code-name">
+            
+                new UnauthorizedError<span class="signature">(body)</span><span class="type-signature"></span>
+            
+        </span>
+    </h4>
+    
 
-      if (!stringBody.includes('&lt;?xml version="1.0" encoding="UTF-8"?>')) {
-        this.setBody('&lt;?xml version="1.0" encoding="UTF-8"?>&lt;Response />');
-        this.setStatusCode(200);
-        return this;
-      }
+    
+    
 
-      this.setBody(stringBody);
-    }
 
-    return this;
-  }
 
-  [Symbol.toStringTag] = this.constructor.name;
-}
 
-module.exports = { TwiMLResponse };
-</code></pre>
-        </article>
-    </section>
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+<div class="table-container">
+    <table class="params table">
+        <thead>
+        <tr>
+            
+            <th>Name</th>
+            
+
+            <th>Type</th>
+
+            
+
+            
+            <th>Default</th>
+            
+
+            <th class="last">Description</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        
+
+            
+<tr class="deep-level-0">
+  
+      <td class="name"><code>body</code></td>
+  
+
+  <td class="type">
+  
+      
+<code class="param-type">string</code>
+
+
+  
+  </td>
+
+  
+
+  
+      <td class="default">
+      
+          The received request could not be verified!
+      
+      </td>
+  
+
+  <td class="description last"><p>A simple description of what goes wrong</p></td>
+</tr>
+
+
+        
+        </tbody>
+    </table>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    
+
+    
+
+    
+
+    
+        <p class="tag-source">
+            <a href="lib_errors_unauthorized.error.js.html" class="button">View Source</a>
+            <span>
+                <a href="lib_errors_unauthorized.error.js.html">lib/errors/unauthorized.error.js</a>, <a href="lib_errors_unauthorized.error.js.html#line8">line 8</a>
+            </span>
+        </p>
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        
+    
+    </div>
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

@@ -9,6 +9,9 @@ const { UnauthorizedError } = require('./lib/errors/unauthorized.error');
 const { Response } = require('./lib/responses/default.response');
 const { TwiMLResponse } = require('./lib/responses/twiml.response');
 
+/**
+ * Exports the functions, Responses and Errors
+ */
 module.exports = {
   useMock,
   useInjection,

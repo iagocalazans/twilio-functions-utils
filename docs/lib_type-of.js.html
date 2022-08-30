@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +7,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title> Response</title>
+  <title> lib/type-of.js</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -97,281 +99,40 @@
         <div class="core" id="main-content-wrapper">
             <div class="content">
                 <header class="page-title">
-                    <p>Class</p>
-                    <h1>Response</h1>
+                    <p>Source</p>
+                    <h1>lib/type-of.js</h1>
                 </header>
                 
 
 
 
-
-<section>
-
-<header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Response<span class="signature">(body, statusCode)</span><span class="type-signature"> &rarr; {<a href="Response.html">Response</a>}</span></h2>
-        
-            <div class="class-description"><p>The Response is the must return value on your CustomFn.</p></div>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class='vertical-section'>
-                <div class="members">
-                    <div class="member">
-                        <div class=name>
-                            <span class="tag">Constructor</span>
-                        </div>
-                        
-
-
-    
-    <h4 class="name" id="Response">
-        <a class="href-link" href="#Response">#</a>
-        
-        <span class="code-name">
-            
-                new Response<span class="signature">(body, statusCode)</span><span class="type-signature"> &rarr; {<a href="Response.html">Response</a>}</span>
-            
-        </span>
-    </h4>
-    
-
-    
-    
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-<div class="table-container">
-    <table class="params table">
-        <thead>
-        <tr>
-            
-            <th>Name</th>
-            
-
-            <th>Type</th>
-
-            
-
-            
-            <th>Default</th>
-            
-
-            <th class="last">Description</th>
-        </tr>
-        </thead>
-
-        <tbody>
-        
-
-            
-<tr class="deep-level-0">
-  
-      <td class="name"><code>body</code></td>
-  
-
-  <td class="type">
-  
-      
-<code class="param-type">string</code>
-|
-
-<code class="param-type">object</code>
-
-
-  
-  </td>
-
-  
-
-  
-      <td class="default">
-      
-      </td>
-  
-
-  <td class="description last"></td>
-</tr>
-
-
-        
-
-            
-<tr class="deep-level-0">
-  
-      <td class="name"><code>statusCode</code></td>
-  
-
-  <td class="type">
-  
-      
-<code class="param-type">number</code>
-
-
-  
-  </td>
-
-  
-
-  
-      <td class="default">
-      
-          200
-      
-      </td>
-  
-
-  <td class="description last"></td>
-</tr>
-
-
-        
-        </tbody>
-    </table>
-</div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    
-
-    
-
-    
-
-    
-        <p class="tag-source">
-            <a href="lib_responses_default.response.js.html" class="button">View Source</a>
-            <span>
-                <a href="lib_responses_default.response.js.html">lib/responses/default.response.js</a>, <a href="lib_responses_default.response.js.html#line16">line 16</a>
-            </span>
-        </p>
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <div class='columns method-parameter'>
-        <div class="column is-2"><label>Returns:</label></div>
-        <div class="column is-10">
-            
-                    
-
-<div class="columns">
-    
-    
-    <div class='column is-5 has-text-left'>
-        <label>Type: </label>
-        
-<code class="param-type"><a href="Response.html">Response</a></code>
-
-
-    </div>
-    
-</div>
-
-                
-        </div>
-    </div>
-
-
-
-
-
-                    </div>
-                </div>
-            </div>
-        
-    
-    </div>
-    
-    
-        <h3 class="subsection-title">Extends</h3>
-
-        
-
-
-    <ul>
-        <li><a href="external-_Twilio.Response_.html">external:"Twilio.Response"</a></li>
-    </ul>
-
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * A more precisely type checker than Javascript built-in typeof.
+ *
+ * @param { * } input The `input` could be of any type that should be checked.
+ *
+ * @example
+ *
+ * typeOf(['myName', 'checker']); // "Array"
+ * typeOf('myName'); // "String"
+ *
+ * @returns { string } Returns a string with the `input` type.
+ */
+const typeOf = function (input) {
+  /**
+     * @type { string }
+     */
+  const stringTag = Object.prototype.toString.call(input);
+  return stringTag.match(/(?&lt;=\[\D+ )[A-Za-z]+/).shift();
+};
+
+module.exports = { typeOf };
+</code></pre>
+        </article>
+    </section>
 
 
 

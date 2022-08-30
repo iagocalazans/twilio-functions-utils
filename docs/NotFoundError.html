@@ -5,7 +5,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title> Response</title>
+  <title> NotFoundError</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -98,7 +98,7 @@
             <div class="content">
                 <header class="page-title">
                     <p>Class</p>
-                    <h1>Response</h1>
+                    <h1>NotFoundError</h1>
                 </header>
                 
 
@@ -109,9 +109,9 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Response<span class="signature">(body, statusCode)</span><span class="type-signature"> &rarr; {<a href="Response.html">Response</a>}</span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>NotFoundError<span class="signature">(body)</span><span class="type-signature"></span></h2>
         
-            <div class="class-description"><p>The Response is the must return value on your CustomFn.</p></div>
+            <div class="class-description"><p>Making your life easier providing a Error like response for NotFound actions</p></div>
         
     
 </header>
@@ -130,12 +130,12 @@
 
 
     
-    <h4 class="name" id="Response">
-        <a class="href-link" href="#Response">#</a>
+    <h4 class="name" id="NotFoundError">
+        <a class="href-link" href="#NotFoundError">#</a>
         
         <span class="code-name">
             
-                new Response<span class="signature">(body, statusCode)</span><span class="type-signature"> &rarr; {<a href="Response.html">Response</a>}</span>
+                new NotFoundError<span class="signature">(body)</span><span class="type-signature"></span>
             
         </span>
     </h4>
@@ -187,9 +187,6 @@
   
       
 <code class="param-type">string</code>
-|
-
-<code class="param-type">object</code>
 
 
   
@@ -200,41 +197,12 @@
   
       <td class="default">
       
-      </td>
-  
-
-  <td class="description last"></td>
-</tr>
-
-
-        
-
-            
-<tr class="deep-level-0">
-  
-      <td class="name"><code>statusCode</code></td>
-  
-
-  <td class="type">
-  
-      
-<code class="param-type">number</code>
-
-
-  
-  </td>
-
-  
-
-  
-      <td class="default">
-      
-          200
+          The content you are looking for was not found!
       
       </td>
   
 
-  <td class="description last"></td>
+  <td class="description last"><p>Describe what hasnt founded here</p></td>
 </tr>
 
 
@@ -280,9 +248,9 @@
 
     
         <p class="tag-source">
-            <a href="lib_responses_default.response.js.html" class="button">View Source</a>
+            <a href="lib_errors_not-found.error.js.html" class="button">View Source</a>
             <span>
-                <a href="lib_responses_default.response.js.html">lib/responses/default.response.js</a>, <a href="lib_responses_default.response.js.html#line16">line 16</a>
+                <a href="lib_errors_not-found.error.js.html">lib/errors/not-found.error.js</a>, <a href="lib_errors_not-found.error.js.html#line8">line 8</a>
             </span>
         </p>
     
@@ -305,29 +273,6 @@
 
 
 
-    <div class='columns method-parameter'>
-        <div class="column is-2"><label>Returns:</label></div>
-        <div class="column is-10">
-            
-                    
-
-<div class="columns">
-    
-    
-    <div class='column is-5 has-text-left'>
-        <label>Type: </label>
-        
-<code class="param-type"><a href="Response.html">Response</a></code>
-
-
-    </div>
-    
-</div>
-
-                
-        </div>
-    </div>
-
 
 
 
@@ -339,17 +284,6 @@
     
     </div>
     
-    
-        <h3 class="subsection-title">Extends</h3>
-
-        
-
-
-    <ul>
-        <li><a href="external-_Twilio.Response_.html">external:"Twilio.Response"</a></li>
-    </ul>
-
-
     
 
     

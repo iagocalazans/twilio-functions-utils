@@ -7,7 +7,7 @@
   
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title> result.js</title>
+  <title> lib/errors/unauthorized.error.js</title>
 
   <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -92,7 +92,7 @@
             
             <nav>
                 
-                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-_Twilio.Response_.html">Twilio.Response</a></li></ul><h3>Classes</h3><ul><li><a href="Response.html">Response</a></li><li><a href="Result.html">Result</a></li><li><a href="TwiMLResponse.html">TwiMLResponse</a></li></ul><h3>Global</h3><ul><li><a href="global.html#typeOf">typeOf</a></li><li><a href="global.html#useInjection">useInjection</a></li><li><a href="global.html#useMock">useMock</a></li></ul></div>
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-_Twilio.Response_.html">Twilio.Response</a></li></ul><h3>Classes</h3><ul><li><a href="BadRequestError.html">BadRequestError</a></li><li><a href="InternalServerError.html">InternalServerError</a></li><li><a href="NotFoundError.html">NotFoundError</a></li><li><a href="Response.html">Response</a></li><li><a href="Result.html">Result</a></li><li><a href="TwiMLResponse.html">TwiMLResponse</a></li><li><a href="UnauthorizedError.html">UnauthorizedError</a></li></ul><h3>Global</h3><ul><li><a href="global.html#typeOf">typeOf</a></li><li><a href="global.html#useInjection">useInjection</a></li><li><a href="global.html#useMock">useMock</a></li></ul></div>
                 
             </nav>
         </div>
@@ -100,7 +100,7 @@
             <div class="content">
                 <header class="page-title">
                     <p>Source</p>
-                    <h1>result.js</h1>
+                    <h1>lib/errors/unauthorized.error.js</h1>
                 </header>
                 
 
@@ -109,96 +109,26 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>const { typeOf } = require('./type-of');
+            <pre class="prettyprint source linenums"><code>const { Response } = require('../responses/default.response');
 
 /**
- * The Result class provides an organized and simple way to return errors without having to wrap every request in Try Catches.
+ * This just like the `InternalServerError` is used inside of the `useInjection` mechanics every time you request for Token validation
  *
  * @class
  */
-class Result {
+class UnauthorizedError extends Response {
   /**
-   * Stores the success return object as #data.
    *
-   * @private
+   * @param {string} body A simple description of what goes wrong
    */
-  #data;
-
-  /**
-   * Stores the failed return object as #error.
-   *
-   * @private
-   */
-  #error;
-
-  /**
-   * @hideconstructor
-   */
-  constructor(data, error) {
-    if (data instanceof Error) {
-      this.#error = data;
-      return;
-    }
-
-    this.#data = data;
-
-    this.#error = error;
+  constructor(body = 'The received request could not be verified!') {
+    super(`[ UnauthorizedError ]: ${body}`, 401);
   }
 
-  /**
-   *  The static function to create new Result objects with the sucessfull data object.
-   *
-   * @param { * } data
-   * @returns { Result }
-   */
-  static ok(data) {
-    return new Result(data);
-  }
-
-  /**
-   *  The static function to create new Result objects with the failed error object.
-   *
-   * @param { (Error|*) } error The error parameter could be of any of the primitive Javascript types, but you should mostly use an Error instance.
-   * @returns { Result }
-   */
-  static failed(error) {
-    return new Result(undefined, error);
-  }
-
-  /**
-   * Check the class type, if it has an error, or not
-   * @type { boolean }
-   */
-  get isError() {
-    return !!this.#error;
-  }
-
-  /**
-   * Retrieve the internal data object.
-   * @readonly
-   */
-  get data() {
-    if (typeOf(this.#error) !== 'Undefined') {
-      throw new Error('This is not a successfull request. Result with error type instead.');
-    }
-
-    return this.#data;
-  }
-
-  /**
-   * Retrieve the internal error object.
-   * @readonly
-   */
-  get error() {
-    if (typeOf(this.#data) !== 'Undefined') {
-      throw new Error('This is a successfull request. Result with data type instead.');
-    }
-
-    return this.#error;
-  }
+  [Symbol.toStringTag] = this.constructor.name;
 }
 
-module.exports = { Result };
+module.exports = { UnauthorizedError };
 </code></pre>
         </article>
     </section>
