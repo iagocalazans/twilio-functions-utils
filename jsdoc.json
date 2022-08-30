@@ -1,0 +1,39 @@
+{
+    "opts": {
+        "template": "node_modules/better-docs",
+        "encoding": "utf8",
+        "destination": "docs/",
+        "readme": "./README.md",
+        "recurse": true,
+        "verbose": true
+    },
+    "plugins": [
+        "plugins/markdown",
+        "node_modules/better-docs/category"
+    ],
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false,
+        "search": true,
+        "better-docs": {
+            "name": "Twilio Functions Utils - Docs",
+            "navLinks": [
+                {
+                    "label": "Github",
+                    "href": "https://github.com/iagocalazans/twilio-functions-utils"
+                },
+                {
+                    "label": "NPM Package",
+                    "href": "https://www.npmjs.com/package/twilio-functions-utils"
+                }
+            ]
+        }
+    },
+    "source": {
+        "include": [
+            "./"
+        ],
+        "includePattern": ".js$",
+        "excludePattern": "(node_modules/|docs|.test.js$|.config.js$)"
+    }
+}

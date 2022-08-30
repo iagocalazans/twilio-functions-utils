@@ -1,0 +1,363 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> use.mock.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">Twilio Functions Utils - Docs</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                 
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/iagocalazans/twilio-functions-utils"
+                        >
+                            Github
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://www.npmjs.com/package/twilio-functions-utils"
+                        >
+                            NPM Package
+                        </a>
+                    
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+                <div class="search-wrapper">
+                    <input id="search" type="text" placeholder="Search docs..." class="input">
+                </div>
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-_Twilio.Response_.html">Twilio.Response</a></li></ul><h3>Classes</h3><ul><li><a href="Response.html">Response</a></li><li><a href="Result.html">Result</a></li><li><a href="TwiMLResponse.html">TwiMLResponse</a></li></ul><h3>Global</h3><ul><li><a href="global.html#typeOf">typeOf</a></li><li><a href="global.html#useInjection">useInjection</a></li><li><a href="global.html#useMock">useMock</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>use.mock.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/* global jest */
+const fs = require('fs');
+
+const readdir = require('@folder/readdir');
+const path = require('path');
+const _ = require('lodash');
+const { InternalServerError } = require('./errors/internal-server.error');
+const { UnauthorizedError } = require('./errors/unauthorized.error');
+
+if (process.env.NODE_ENV === 'test') {
+  const functionsPath = fs.existsSync(path.join(
+    '.', 'src', 'functions',
+  )) ? './src/functions' : './functions';
+
+  const assetsPath = fs.existsSync(path.join(
+    '.', 'src', 'assets',
+  )) ? './src/assets' : './assets';
+
+  const functions = readdir.sync(functionsPath, {
+    base: functionsPath,
+    recursive: true,
+    nodir: true,
+  });
+
+  const assets = readdir.sync(assetsPath, {
+    base: assetsPath,
+    recursive: true,
+    nodir: true,
+  });
+
+  const mockedValue = {};
+  const SyncMapContext = function (uniqueContextName) {
+    function SyncMapInstance(uniqueName) {
+      this.uniqueName = uniqueName;
+
+      function SyncMapItemsContext(itemContextSid) {
+        function SyncMapItems(itemSid) {
+          this.sid = itemSid;
+          this.data = mockedValue;
+
+          this.fetch = async () => this;
+          this.update = async (data) => {
+            await new Promise((resolve) => {
+              const oldProps = Object.keys(mockedValue);
+
+              oldProps.forEach((prop) => {
+                delete mockedValue[prop];
+              });
+
+              resolve(mockedValue);
+            });
+
+            const props = Object.keys(data);
+
+            props.forEach((prop) => {
+              Object.defineProperty(
+                mockedValue, prop, {
+                  enumerable: true,
+                  value: data[prop],
+                  writable: true,
+                },
+              );
+            });
+
+            return this;
+          };
+
+          return this;
+        }
+
+        return new SyncMapItems(itemContextSid);
+      }
+
+      Object.defineProperty(
+        SyncMapItemsContext, 'create', {
+          value: async (data) => {
+            if (_.isUndefined(data.key)) {
+              throw new Error('Error while creating Sync, key cant be undefined!');
+            }
+
+            return data;
+          },
+        },
+      );
+
+      Object.defineProperty(
+        SyncMapItemsContext, 'setMapItemFetchResolvedValue', {
+          value: async (data) => {
+            await new Promise((resolve) => {
+              const oldProps = Object.keys(mockedValue);
+
+              oldProps.forEach((prop) => {
+                delete mockedValue[prop];
+              });
+
+              resolve(mockedValue);
+            });
+
+            const props = Object.keys(data);
+
+            props.forEach((prop) => {
+              Object.defineProperty(
+                mockedValue, prop, {
+                  enumerable: true,
+                  value: data[prop],
+                  writable: true,
+                },
+              );
+            });
+          },
+          enumerable: true,
+          configurable: true,
+          writable: true,
+        },
+      );
+
+      this.syncMapItems = SyncMapItemsContext;
+    }
+
+    return new SyncMapInstance(uniqueContextName);
+  };
+
+  Object.defineProperty(
+    SyncMapContext, 'create', {
+      value: async (data) => {
+        if (_.isUndefined(data.uniqueName)) {
+          throw new Error('Error while creating Sync, uniqueName cant be undefined!');
+        }
+
+        return data;
+      },
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    },
+  );
+
+  const syncMapItemCreator = SyncMapContext;
+
+  Object.defineProperty(
+    global, 'Runtime', {
+      enumerable: true,
+      get: () => ({
+        getFunctions: jest.fn(() => (functions.reduce((p, c) => {
+          p[`${c.replace(/\.protected\.js|\.protected\.ts/, '').replace(/\.private\.js|\.private\.ts/, '').replace(/\.js|\.ts/, '')}`] = {
+            path: path.resolve(functionsPath, c).replace(/\.js|\.ts/, ''),
+          };
+          return p;
+        }, {}))),
+        getSync: (_service) => ({
+          maps: syncMapItemCreator,
+        }),
+        getAssets: jest.fn(() => (assets.reduce((p, c) => {
+          p[`/${c.replace(/\.private|\.private/, '')}`] = {
+            path: path.resolve(assetsPath, c).replace(/\.js|\.ts/, ''),
+          };
+          return p;
+        }, {}))),
+      }),
+    },
+  );
+
+  /**
+   * @param {function} fn
+   * @param {object} [params]
+   * @param {object} [params.providers]
+   * @param {object} [params.env]
+   * @param {object} [params.client]
+   */
+  const useMock = (fn, params) => async function (...args) {
+    const [event] = args;
+    const getTwilioClient = jest.fn();
+
+    const providers = _.isUndefined(params?.providers)
+      || !_.isPlainObject(params?.providers)
+      ? {} : params.providers;
+
+    const env = _.isUndefined(params?.env)
+      || !_.isPlainObject(params?.env)
+      ? {} : params.env;
+
+    const client = _.isUndefined(params?.client)
+    || !_.isObject(params?.client)
+      ? getTwilioClient() : params.client;
+
+    const providerThat = {
+      client,
+      env,
+    };
+
+    const {
+      request, cookies, ...values
+    } = event;
+
+    const providerNames = Object.keys(providers);
+
+    const that = {
+      request,
+      cookies,
+      env,
+      providers: providerNames.reduce((p, c) => {
+        Reflect.defineProperty(
+          p, c, {
+            value: providers[c].bind(providerThat),
+            enumerable: true,
+          },
+        );
+        return p;
+      }, {}),
+    };
+
+    try {
+      return await fn.apply(that, [values]);
+    } catch (err) {
+      if (typeof err === 'string') {
+        return new UnauthorizedError(err);
+      }
+
+      return new InternalServerError(err);
+    }
+  };
+
+  module.exports = { useMock };
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.11</a></p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+<script src="scripts/search.js"> </script>
+
+
+</body>
+</html>

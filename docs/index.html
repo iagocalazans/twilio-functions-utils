@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> Home</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+             
+                <a href="index.html">
+                    <h1 class="navbar-item">Twilio Functions Utils - Docs</h1>
+                </a>
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    Documentation
+                </a>
+                
+                 
+                    
+                        <a
+                            class="link user-link "
+                            href="https://github.com/iagocalazans/twilio-functions-utils"
+                        >
+                            Github
+                        </a>
+                    
+                        <a
+                            class="link user-link "
+                            href="https://www.npmjs.com/package/twilio-functions-utils"
+                        >
+                            NPM Package
+                        </a>
+                    
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+                <div class="search-wrapper">
+                    <input id="search" type="text" placeholder="Search docs..." class="input">
+                </div>
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Externals</h3><ul><li><a href="external-_Twilio.Response_.html">Twilio.Response</a></li></ul><h3>Classes</h3><ul><li><a href="Response.html">Response</a></li><li><a href="Result.html">Result</a></li><li><a href="TwiMLResponse.html">TwiMLResponse</a></li></ul><h3>Global</h3><ul><li><a href="global.html#typeOf">typeOf</a></li><li><a href="global.html#useInjection">useInjection</a></li><li><a href="global.html#useMock">useMock</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p></p>
+                    <h1>Home</h1>
+                </header>
+                
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>Twilio Functions Utils</h1>
+<img src="https://avatars.githubusercontent.com/u/109142?s=200&v=4" width="80" />
+<h2>ABOUT</h2>
+<p><img src="https://img.shields.io/npm/v/twilio-functions-utils?color=white&amp;label=version&amp;logo=npm&amp;style=for-the-badge" alt="npm"> <img src="https://img.shields.io/npm/dw/twilio-functions-utils?color=white&amp;logo=npm&amp;style=for-the-badge" alt="npm"> <img src="https://img.shields.io/npms-io/final-score/twilio-functions-utils?color=white&amp;label=score&amp;logo=npm&amp;logoColor=white&amp;style=for-the-badge" alt="npms.io (final)"> <img src="https://img.shields.io/coveralls/github/iagocalazans/twilio-functions-utils?color=white&amp;logo=coveralls&amp;style=for-the-badge" alt="Coveralls"></p>
+<p>This lib was created with the aim of simplifying the use of serverless Twilio, reducing the need to apply frequent try-catches and improving context management, making it no longer necessary to return the callback() method in all functions.</p>
+<h3>Install</h3>
+<pre class="prettyprint source lang-cmd"><code>npm install twilio-functions-utils
+</code></pre>
+<h2>HOW IT WORKS</h2>
+<p>The lib provides a function <code>useInjection</code> who returns a brand function for every execution. This returned function is ready to receive the Twilio Handler arguments and make them available as <code>this</code>  properties as <code>this.request</code>, <code>this.cookies</code> and <code>this.env</code> at the Function level and <code>this.client</code> and <code>this.env</code> at the Provider function level.</p>
+<h3># useInjection(Function, Options) <sup><sub>Function</sub></sup></h3>
+<p>The useInjection method takes two parameters. The first to apply as a handler and the last is an object of configuration options.</p>
+<h5>[useInjection] Function <sup><sub>Function</sub></sup></h5>
+<p>Must be writen in standard format, this will be your <code>handler</code> function.</p>
+<pre class="prettyprint source lang-js"><code>  function createSomeThing (event) {
+    ...
+  }
+</code></pre>
+<h5>[useInjection] Options.providers <sup><sub>Object</sub></sup></h5>
+<p>An object that can contain providers that will be defined, which act as use cases to perform internal actions in the handler function through the <code>this.providers</code> method.</p>
+<h5>[useInjection] Options.validateToken <sup><sub>Boolean</sub></sup></h5>
+<p>You can pass <code>validateToken</code> equal true to force Flex Token validation using <a href="https://github.com/twilio/twilio-flex-token-validator">Twilio Flex Token Validator</a></p>
+<pre class="prettyprint source lang-js"><code>useInjection(yourFunction,
+  {
+    providers: { create, remove },
+    validateToken: true
+  }
+);
+</code></pre>
+<p>When using Token Validator, the Request body must contain a valid Token from Twilio Flex.</p>
+<pre class="prettyprint source lang-js"><code>// Event
+{
+  Token: &quot;Twilio-Token-Here&quot;
+}
+</code></pre>
+<h3>Response <sup><sub>Class</sub></sup></h3>
+<p>The responses coming from the function destined to the handler must be returned as an instance of Response.</p>
+<p>Response receives a string and a number (status code):</p>
+<pre class="prettyprint source lang-js"><code>return new Response('Your pretty answer.', 200);
+</code></pre>
+<p>There are two failure response models, BadRequest and NotFound. Its use follows the same model.</p>
+<pre class="prettyprint source lang-js"><code>const notFound = new NotFoundError('Your error message here.');
+const badRequest = new BadRequestError('Your error message here.');
+</code></pre>
+<h3>TwiMLResponse <sup><sub>Class</sub></sup></h3>
+<p>There is a proper response template to use with the TwiML format:</p>
+<pre class="prettyprint source lang-js"><code>const twimlVoice = new Twilio.twiml
+  .VoiceResponse();
+
+const enqueueVoice = twimlVoice
+  .enqueue({
+    action,
+    workflowSid,
+  })
+  .task('{}');
+
+return new TwiMLResponse(twimlVoice, 201)
+</code></pre>
+<h4>Usage</h4>
+<p><strong>IMPORTANT TO USE REGULAR FUNCTIONS</strong> ➜ With arrow functions it doesn't work as expected as <code>this</code> cannot be injected correctly.</p>
+<pre class="prettyprint source lang-js"><code>  function yourFunctionName() {
+    // ...
+  }
+</code></pre>
+<p>Separate your actions from the main routine of the code. Break it down into several smaller parts that interact with your event, to facilitate future changes. You can create functions such as Assets or Functions, then just import them through the Runtime and pass them to the provider.</p>
+<pre class="prettyprint source lang-js"><code>// File: assets/create.private.js
+
+const { Result } = require('twilio-functions-utils');
+
+/**
+ * Here you can acess  Twilio Client as client and Context as env (so you can get env vars).
+ * 
+ * @function
+ * @param { object } event
+ */
+exports.create = async function (event) {
+  const { client, env } = this
+
+  return Result.ok(await new Promise((resolve, reject) => {
+    const random = Math.random();
+
+    if (random >= 0.5) {
+      return resolve({ sucess: 'Resolved' });
+    }
+  
+    return reject(new Error('Unresolved'));
+  }));
+};
+</code></pre>
+<p>In your handler you will have access to the function through the providers property, internal to the this of the function that precedes the handler.</p>
+<pre class="prettyprint source lang-js"><code>// File: functions/create.js
+
+const { useInjection, Response } = require('twilio-functions-utils');
+const { create } = require(Runtime.getAssets()['/create.js'].path)
+
+/**
+ * @typedef { object } CreateActionThis
+ * 
+ * @property { object } request
+ * @property { object } cookies
+ * @property { object } env
+ * @property { string } env.DOMAIN_NAME
+ * @property { object } providers
+ * @property { create } providers.create
+ */
+
+/**
+ * You can perform all your &quot;controller&quot; level actions, as you have access to the request headers and cookies.
+ * Then just call the providers you provided to handler by using useInjection.
+ * Just put it on a Response object and you are good to go!
+ * 
+ * @function
+ * @param { object } event
+ * @this CreateActionThis
+ */
+async function createAction(event) {
+  const { cookies, request, env } = this
+  const providerResult = await this.providers.create(event)
+
+  if (providerResult.isError) {
+    return new BadRequestError(providerResult.error);
+  }
+
+  return new Response(providerResult.data, 201);
+}
+
+exports.handler = useInjection(createAction, {
+  providers: {
+    create,
+  },
+  validateToken: true, // When using Token Validator, the Request body must contain a valid Token from Twilio.
+});
+</code></pre>
+<h2>EXTRAS</h2>
+<h3># typeOf(Value) <sup><sub>Function</sub></sup></h3>
+<p>A simple method to discovery a value type. This is more specific then the original JavaScript <code>typeof</code>.</p>
+<p>It will return as <code>Array</code>, <code>Object</code>, <code>String</code>, <code>Number</code>, <code>Symbol</code>.</p>
+<h5>[typeOf] Value <sup><sub>*</sub></sup></h5>
+<p>Could be any JavaScript primitive value to be type checked.</p>
+<h4>Usage</h4>
+<pre class="prettyprint source lang-js"><code>const { typeOf } = require('twilio-functions-utils');
+
+const type = typeOf('my name is Lorem');
+const typeArray = typeOf(['one', 'two']);
+const original = typeof ['one', 'two']
+
+console.log(type) // String
+console.log(typeArray) // Array
+console.log(original) // object
+</code></pre>
+<h3># Result <sup><sub>Class</sub></sup></h3>
+<p>The Result class provides an organized and simple way to return errors without having to wrap every request in Try Catches.</p>
+<h4>Methods</h4>
+<h5>Result.ok(data)</h5>
+<p>Use the <code>.ok</code> method to create a new Result instance with a data property and isError <code>false</code>.</p>
+<h6>[Result.ok] data <sup><sub>*</sub></sup></h6>
+<p>The data value could be of any of the primitives types that javascript accpets.</p>
+<h5>Result.failed(error)</h5>
+<p>Use the <code>.failed</code> method to create a new Result instance with an error property and isError <code>true</code>.</p>
+<h6>[Result.failed] error <sup><sub>(Error|*)</sub></sup></h6>
+<p>The data value must be preferably of Error type, but you can use any of the primitive ones...</p>
+<h4>Properties</h4>
+<h5>Result.isError</h5>
+<p>A boolean propety that return true when Result contain a defined error value.</p>
+<h5>Result.data</h5>
+<p>The successfully returned value.</p>
+<h5>Result.error</h5>
+<p>An Error like object throwed by the &quot;action&quot; as result.</p>
+<h4>Usage</h4>
+<pre class="prettyprint source lang-js"><code>const result = Result.ok(value);
+// or
+const result = Result.ok(await value);
+// or
+const result = Result.failed(error);
+
+
+if (result.isError) {
+  return new BadRequestError(result.error)
+}
+
+return new Response(result.data)
+</code></pre>
+<h2>TESTING</h2>
+<h3># useMock(Function, Options) <sup><sub>Function</sub></sup></h3>
+<p>The Twilio Serverless structure make it hard for testing sometimes. So this provides a method that works perfectly with useInjection ready functions. The <code>useMock</code> act like useInjection but mocking some required fragments as <code>getAssets</code> and <code>getFunctions</code>.</p>
+<h6>[useMock] Function <sup><sub>Function</sub></sup></h6>
+<p>The same function as used in <code>useInjection</code>.</p>
+<h6>[useMock] Options.providers <sup><sub>Object</sub></sup></h6>
+<p>Unlike <code>useInjection</code>, the <code>useMock</code> method only receives the <code>Options.providers</code> property.</p>
+<h4>Usage</h4>
+<p><strong>(Required)</strong> Set your <code>jest</code> testing script with <code>NODE_ENV=test</code>:</p>
+<pre class="prettyprint source"><code>&quot;scripts&quot;: {
+    &quot;test&quot;: &quot;NODE_ENV=test jest --collect-coverage --watchAll&quot;,
+    &quot;start&quot;: &quot;twilio-run&quot;,
+    &quot;deploy&quot;: &quot;twilio-run deploy&quot;
+  }
+</code></pre>
+<p>Your files structures must be have <code>assets</code> and <code>functions</code> into first or second levels starting from <code>src</code> (when in second level):</p>
+<pre class="prettyprint source"><code>app/
+├─ package.json
+├─ node_modules/
+├─ src/
+│  ├─ functions/
+│  ├─ assets/
+</code></pre>
+<p>or:</p>
+<pre class="prettyprint source"><code>app/
+├─ package.json
+├─ functions/
+├─ assets/
+├─ node_modules/
+</code></pre>
+<p>Exports your function to be tested and your handler so it can be used by Twilio when in runtime:</p>
+<pre class="prettyprint source lang-js"><code>async function functionToBeTested(event) {
+  const something = await this.providers.myCustomProvider(event)
+  return Response(something)
+}
+
+const handler = useInjection(functionToBeTested, {
+  providers: {
+    myCustomProvider,
+  },
+});
+
+module.exports = { functionToBeTested, handler }; // &lt;--
+</code></pre>
+<p><strong>(Required)</strong> You always need to import the <code>twilio.mock</code> for Response Twilio Global object on your testing files begining.</p>
+<pre class="prettyprint source lang-js"><code>require('twilio-functions-utils/lib/twilio.mock');
+</code></pre>
+<p>Use Twilio Functions Utils <code>useMock</code> to do the hard job and just write your tests with the generated function.</p>
+<pre class="prettyprint source lang-js"><code>/* global describe, it, expect */
+
+require('twilio-functions-utils/lib/twilio.mock');
+
+const { useMock, Response } = require('twilio-functions-utils');
+const { functionToBeTested } = require('../../functions/functionToBeTested'); // &lt;-- Import here!
+
+// Create the test function from the function to be tested
+const fn = useMock(functionToBeTested, {
+  providers: {
+    myCustomProvider: async (sid) => ({ sid }), // Mock the providers implementation.
+  },
+  env: {
+    YOUR_ENV_VAR: 'value'
+  },
+  client: {
+    functionToMock: {}
+  }
+});
+
+describe('Function functionToBeTested', () => {
+  it('if {&quot;someValue&quot;: true}', async () => {
+    const request = { TaskSid: '1234567', TaskAttributes: '{&quot;someValue&quot;: true}' };
+
+    const res = await fn(request);
+
+    expect(res).toBeInstanceOf(Response);
+    expect(res.body).not.toEqual(request);
+    expect(res.body).toEqual({ sid: '1234567' });
+  });
+});
+</code></pre>
+<p>You can mock your getSync map items fetch results with <code>setMapItemFetchResolvedValue</code> as follow</p>
+<pre class="prettyprint source lang-js"><code>await Runtime.getSync().maps().syncMapItems.setMapItemFetchResolvedValue( &lt;object> );
+</code></pre>
+<h2>AUTHOR</h2>
+<ul>
+<li><a href="https://github.com/iagocalazans">Iago Calazans</a> - 🛠 Senior Node.js Engineer at <a href="https://www.stone.com.br/">Stone</a></li>
+</ul></article>
+    </section>
+
+
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.11</a></p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+<script src="scripts/search.js"> </script>
+
+
+</body>
+</html>
