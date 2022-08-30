@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "jest --coverage && coveralls < coverage/lcov.info",
-    "lint": "eslint --fix index.js lib/"
+    "lint": "eslint --fix index.js lib/",
+    "docs": "./node_modules/.bin/jsdoc -c jsdoc.json"
   },
   "repository": {
     "type": "git",
@@ -33,14 +34,7 @@
   "bugs": {
     "url": "https://github.com/iagocalazans/twilio-functions-utils/issues"
   },
-  "homepage": "https://github.com/iagocalazans/twilio-functions-utils#readme",
-  "dependencies": {
-    "@folder/readdir": "^3.1.0",
-    "@twilio/runtime-handler": "^1.2.3",
-    "lodash": "^4.17.21",
-    "twilio": "^3.77.2",
-    "twilio-flex-token-validator": "^1.5.6"
-  },
+  "homepage": "https://iagocalazans.github.io/twilio-functions-utils",
   "overrides": {
     "@twilio/runtime-handler@^1.2.3": {
       "moment": ">=2.29.4"
@@ -52,8 +46,17 @@
       }
     }
   },
+  "dependencies": {
+    "@folder/readdir": "^3.1.0",
+    "@twilio/runtime-handler": "^1.2.3",
+    "lodash": "^4.17.21",
+    "twilio": "^3.77.2",
+    "twilio-flex-token-validator": "^1.5.6"
+  },
   "devDependencies": {
     "@twilio-labs/serverless-runtime-types": "^2.2.3",
+    "jsdoc": "^3.6.11",
+    "better-docs": "^2.7.2",
     "coveralls": "^3.1.1",
     "eslint": "^8.14.0",
     "eslint-config-airbnb-base": "^15.0.0",

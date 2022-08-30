@@ -8,3 +8,5 @@ functions/
 coverage/
 .travis.yml
 .env
+jsdoc.json
+docs/
