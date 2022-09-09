@@ -128,38 +128,32 @@ describe('Function useMock', () => {
     }/assets/use-to-test`);
   });
 
-  it('Should throw an error while creating a map without uniqueName', async () => {
-    try {
-      await Runtime.getSync().maps.create({ data: { notToTeste: 'something' } });
-    } catch (err) {
-      expect(err).toBeInstanceOf(Error);
-      expect(err.message).toMatch('Error while creating Sync, uniqueName cant be undefined!');
-    }
-  });
-
   it('Should throw an error while creating a syncMapItems without key', async () => {
     try {
-      await Runtime.getSync().maps('').syncMapItems.create({ data: { notToTeste: 'something' } });
+      await Runtime.getSync().maps('SN****').syncMapItems.create({ data: { notToTeste: 'something' } });
     } catch (err) {
       expect(err).toBeInstanceOf(Error);
-      expect(err.message).toMatch('Error while creating Sync, key cant be undefined!');
+      expect(err.message).toMatch("Required parameter \"opts['key']\" missing.");
     }
   });
 
   it('Should find paths for getSync', async () => {
-    await Runtime.getSync().maps.create({ uniqueName: 'Call-undefined', data: { notToTeste: 'something' } });
+    Twilio.mockRequestResolvedValue({
+      statusCode: 201,
+      body: { key: 'Call-undefined', data: { value: 'first' } },
+    });
 
-    await Runtime.getSync().maps().syncMapItems.create({ key: 'Call-undefined', teste: 'first' });
+    Twilio.mockRequestResolvedValue({
+      statusCode: 200,
+      body: { key: 'Call-undefined', data: { teste: 'postUpdate' } },
+    });
 
-    await Runtime.getSync().maps().syncMapItems.setMapItemFetchResolvedValue({ teste: 'object' });
-    await Runtime.getSync().maps().syncMapItems.setMapItemFetchResolvedValue({ teste: 'objected' });
+    const maps = await Runtime.getSync().maps('SN****').syncMapItems('SI****').fetch();
 
-    const maps = await Runtime.getSync().maps().syncMapItems('').fetch();
+    expect(maps.data).toEqual({ value: 'first' });
 
-    expect(maps.data).toEqual({ teste: 'objected' });
+    const updatedMaps = await maps.update({ teste: 'postUpdate' });
 
-    await maps.update({ teste: 'postUpdate' });
-
-    expect(maps.data).toEqual({ teste: 'postUpdate' });
+    expect(updatedMaps.data).toEqual({ teste: 'postUpdate' });
   });
 });
