@@ -34,7 +34,7 @@ export class TwiMLResponse {
 }
 
 export class Response {
-    constructor(body?: any, statusCode?: number);
+    constructor(body?: Record<string, any> | string, statusCode?: number);
 }
 
 /**
