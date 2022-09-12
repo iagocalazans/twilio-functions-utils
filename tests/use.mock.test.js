@@ -88,7 +88,7 @@ describe('Function useMock', () => {
     const callback = await fn({ type: 'internalServer', forceFail: true });
 
     expect(callback).toBeInstanceOf(InternalServerError);
-    expect(callback.body).toEqual('[ InternalServerError ]: Error: Check fail condition!');
+    expect(callback.body).toEqual('[ InternalServerError ]: Check fail condition!');
   });
 
   it('Should respond with a Response Instance', async () => {
@@ -110,6 +110,17 @@ describe('Function useMock', () => {
       to: '+55*****1*****',
       from: '+55*****2*****',
     });
+  });
+
+  it('Should respond with a InternalServerError when request rejects', async () => {
+    Twilio.mockRequestRejectedValue(new Error('Something failed on the process.'));
+
+    const callback = await fn({
+      type: 'response', forceFail: false, to: '+55*****1*****', from: '+55*****2*****',
+    });
+
+    expect(callback).toBeInstanceOf(InternalServerError);
+    expect(callback.body).toBe('[ InternalServerError ]: Something failed on the process.');
   });
 
   it('Should respond with an UnauthorizedError Instance', async () => {
