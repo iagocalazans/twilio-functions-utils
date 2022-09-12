@@ -329,6 +329,7 @@ require('twilio-functions-utils/lib/twilio.mock');
 ```
 
 Use Twilio Functions Utils `useMock` to do the hard job and just write your tests with the generated function.
+You can use `Twilio.mockRequestResolvedValue`, `Twilio.mockRequestImplementation`, `Twilio.mockRequestRejectedValue` to Mock your Twilio API requests.
 
 ```js
 /* global describe, it, expect */
@@ -355,19 +356,31 @@ describe('Function functionToBeTested', () => {
   it('if {"someValue": true}', async () => {
     const request = { TaskSid: '1234567', TaskAttributes: '{"someValue": true}' };
 
+    Twilio.mockRequestResolvedValue({
+      statusCode: 200,
+      body: {
+        sid: '1234567'
+      }
+    })
+    
+    Twilio.mockRequestResolvedValue({
+      statusCode: 200,
+      body: {
+        key: "MP****",
+        data: { sid: '7654321' }
+      }
+    })
+
     const res = await fn(request);
+    
+    const customMap = await Runtime.getSync().maps("MP****").fetch();
 
     expect(res).toBeInstanceOf(Response);
     expect(res.body).not.toEqual(request);
+    expect(res.data).toEqual({ sid: '7654321' });
     expect(res.body).toEqual({ sid: '1234567' });
   });
 });
-```
-
-You can mock your getSync map items fetch results with `setMapItemFetchResolvedValue` as follow
-
-```js
-await Runtime.getSync().maps().syncMapItems.setMapItemFetchResolvedValue( <object> );
 ```
 
 ## AUTHOR
