@@ -1,4 +1,4 @@
-/* global jest, describe, it, expect, Runtime */
+/* global jest, describe, it, expect, Runtime, Twilio */
 
 require('../lib/twilio.mock');
 const fs = require('fs');
@@ -20,14 +20,14 @@ const responseTypes = {
   badRequest: () => new BadRequestError(),
   internalServer: () => new InternalServerError(),
   notFound: () => new NotFoundError(),
-  response: (provided) => new Response(provided),
+  response: (provided) => new Response({ ...provided }),
   responseAsString: (provided) => new Response(provided.message),
 };
 
 const { functionUsedToTest } = require(Runtime.getFunctions()['use-to-test'].path);
 const { assetUsedToTest } = require(Runtime.getAssets()['/use-to-test.js'].path);
 
-function useItToMock(event) {
+async function useItToMock(event) {
   const provided = this.providers.useItAsProvider(event);
 
   if (event.forceFail) {
@@ -39,7 +39,7 @@ function useItToMock(event) {
     throw 'forceUnauthorized condition!';
   }
 
-  const reprovided = this.providers
+  const reprovided = await this.providers
     .functionUsedToTest(this.providers
       .assetUsedToTest(event));
 
@@ -66,14 +66,19 @@ const fn = useMock(useItToMock, {
   env: {
     SOMETEST_VAR: 'VariableDefined',
   },
-  client: {
-    someFunction: (value) => value,
-  },
 });
 
 describe('Function useMock', () => {
   it('Should respond with an InternalServerError Instance', async () => {
-    const callback = await fn({ type: 'internalServer', forceFail: false });
+    Twilio.mockRequestResolvedValue({
+      statusCode: 200,
+      body: {
+        sid: 'CA****', account_sid: 'AC****', to: '+55***********', from: '+55***********', parent_call_sid: 'CA****',
+      },
+    });
+    const callback = await fn({
+      type: 'internalServer', forceFail: false, to: '+55***********', from: '+55***********',
+    });
 
     expect(callback).toBeInstanceOf(InternalServerError);
     expect(callback.body).toEqual('[ InternalServerError ]: The server encountered an unexpected condition that prevented it from fulfilling the request!');
@@ -87,10 +92,24 @@ describe('Function useMock', () => {
   });
 
   it('Should respond with a Response Instance', async () => {
-    const callback = await fn({ type: 'response', forceFail: false });
+    Twilio.mockRequestResolvedValue({
+      statusCode: 200,
+      body: {
+        sid: 'CA****', account_sid: 'AC****', to: '+55*****1*****', from: '+55*****2*****', parent_call_sid: 'CA****',
+      },
+    });
+    const callback = await fn({
+      type: 'response', forceFail: false, to: '+55*****1*****', from: '+55*****2*****',
+    });
 
     expect(callback).toBeInstanceOf(Response);
-    expect(callback.body).toEqual({ evaluated: true, forceFail: false, type: 'response' });
+    expect(callback.body).toMatchObject({
+      sid: 'CA****',
+      parentCallSid: 'CA****',
+      accountSid: 'AC****',
+      to: '+55*****1*****',
+      from: '+55*****2*****',
+    });
   });
 
   it('Should respond with an UnauthorizedError Instance', async () => {
@@ -109,38 +128,32 @@ describe('Function useMock', () => {
     }/assets/use-to-test`);
   });
 
-  it('Should throw an error while creating a map without uniqueName', async () => {
-    try {
-      await Runtime.getSync().maps.create({ data: { notToTeste: 'something' } });
-    } catch (err) {
-      expect(err).toBeInstanceOf(Error);
-      expect(err.message).toMatch('Error while creating Sync, uniqueName cant be undefined!');
-    }
-  });
-
   it('Should throw an error while creating a syncMapItems without key', async () => {
     try {
-      await Runtime.getSync().maps('').syncMapItems.create({ data: { notToTeste: 'something' } });
+      await Runtime.getSync().maps('SN****').syncMapItems.create({ data: { notToTeste: 'something' } });
     } catch (err) {
       expect(err).toBeInstanceOf(Error);
-      expect(err.message).toMatch('Error while creating Sync, key cant be undefined!');
+      expect(err.message).toMatch("Required parameter \"opts['key']\" missing.");
     }
   });
 
   it('Should find paths for getSync', async () => {
-    await Runtime.getSync().maps.create({ uniqueName: 'Call-undefined', data: { notToTeste: 'something' } });
+    Twilio.mockRequestResolvedValue({
+      statusCode: 201,
+      body: { key: 'Call-undefined', data: { value: 'first' } },
+    });
 
-    await Runtime.getSync().maps().syncMapItems.create({ key: 'Call-undefined', teste: 'first' });
+    Twilio.mockRequestResolvedValue({
+      statusCode: 200,
+      body: { key: 'Call-undefined', data: { teste: 'postUpdate' } },
+    });
 
-    await Runtime.getSync().maps().syncMapItems.setMapItemFetchResolvedValue({ teste: 'object' });
-    await Runtime.getSync().maps().syncMapItems.setMapItemFetchResolvedValue({ teste: 'objected' });
+    const maps = await Runtime.getSync().maps('SN****').syncMapItems('SI****').fetch();
 
-    const maps = await Runtime.getSync().maps().syncMapItems('').fetch();
+    expect(maps.data).toEqual({ value: 'first' });
 
-    expect(maps.data).toEqual({ teste: 'objected' });
+    const updatedMaps = await maps.update({ teste: 'postUpdate' });
 
-    await maps.update({ teste: 'postUpdate' });
-
-    expect(maps.data).toEqual({ teste: 'postUpdate' });
+    expect(updatedMaps.data).toEqual({ teste: 'postUpdate' });
   });
 });
