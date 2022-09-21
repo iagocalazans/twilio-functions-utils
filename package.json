@@ -44,6 +44,11 @@
       "@twilio-labs/serverless-api@5.4.2": {
         "file-type": ">=16.5.4"
       }
+    },
+    "better-docs@^2.7.2": {
+      "vue-docgen-api@3.26.0": {
+        "pug": "^3.0.1"
+      }
     }
   },
   "dependencies": {
