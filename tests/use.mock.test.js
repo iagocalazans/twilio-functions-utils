@@ -112,6 +112,28 @@ describe('Function useMock', () => {
     });
   });
 
+  it('Should mock the Twilio mock with a Response Instance', async () => {
+    Twilio.mockRequestImplementation(async () => ({
+      statusCode: 200,
+      body: {
+        sid: 'CA****', account_sid: 'AC****', to: '+55*****1*****', from: '+55*****2*****', parent_call_sid: 'CA****',
+      },
+    }));
+
+    const callback = await fn({
+      type: 'response', forceFail: false, to: '+55*****1*****', from: '+55*****2*****',
+    });
+
+    expect(callback).toBeInstanceOf(Response);
+    expect(callback.body).toMatchObject({
+      sid: 'CA****',
+      parentCallSid: 'CA****',
+      accountSid: 'AC****',
+      to: '+55*****1*****',
+      from: '+55*****2*****',
+    });
+  });
+
   it('Should respond with a InternalServerError when request rejects', async () => {
     Twilio.mockRequestRejectedValue(new Error('Something failed on the process.'));
 
@@ -144,7 +166,7 @@ describe('Function useMock', () => {
       await Runtime.getSync().maps('SN****').syncMapItems.create({ data: { notToTeste: 'something' } });
     } catch (err) {
       expect(err).toBeInstanceOf(Error);
-      expect(err.message).toMatch("Required parameter \"opts['key']\" missing.");
+      expect(err.message).toMatch("Required parameter \"params['key']\" missing.");
     }
   });
 
