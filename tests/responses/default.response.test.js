@@ -32,6 +32,12 @@ describe('Twilio Response', () => {
     expect(response.statusCode).toBe(201);
   });
 
+  it('Should have statusCode equal 201', () => {
+    const response = new Response([{ value: 'My awesome response!' }], 201);
+
+    expect(response.statusCode).toBe(201);
+  });
+
   it('Should have headers equal definition', () => {
     const originalHeaders = {
       'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'OPTIONS, POST', 'Access-Control-Allow-Headers': 'Content-Type', 'Content-Type': 'text/plain',
