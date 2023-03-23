@@ -1,3 +1,5 @@
+import { Try } from 'try2catch'
+
 export type useInjectionFn<T, V = any, X = any> = (this: {
     providers: V, 
     request: Record<string, string>, 
@@ -61,3 +63,5 @@ export class BadRequestError {
     constructor(body?: string);
     [Symbol.toStringTag]: string;
 }
+
+export { Try, typeOf }
