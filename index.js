@@ -1,6 +1,5 @@
+const { Try } = require('try2catch');
 const { useInjection } = require('./lib/use.injection');
-const { typeOf } = require('./lib/type-of');
-const { Result } = require('./lib/result');
 const { useMock } = require('./lib/use.mock');
 const { BadRequestError } = require('./lib/errors/bad-request.error');
 const { InternalServerError } = require('./lib/errors/internal-server.error');
@@ -12,12 +11,11 @@ const { TwiMLResponse } = require('./lib/responses/twiml.response');
 module.exports = {
   useMock,
   useInjection,
-  typeOf,
   Response,
   BadRequestError,
   InternalServerError,
   NotFoundError,
   TwiMLResponse,
   UnauthorizedError,
-  Result,
+  Try,
 };
