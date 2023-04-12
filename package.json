@@ -1,6 +1,6 @@
 {
   "name": "twilio-functions-utils",
-  "version": "2.5.3",
+  "version": "2.4.3",
   "description": "Twilio Functions utils library",
   "main": "index.js",
   "types": "./types/twilio-functions-utils",
@@ -22,8 +22,8 @@
     "serverless",
     "functions",
     "utils",
-    "injection",
-    "dependency"
+    "dependency",
+    "injection"
   ],
   "author": "Iago Calazans <iago.calazans@gmail.com>",
   "license": "MIT",
@@ -43,7 +43,7 @@
     "@twilio/runtime-handler": "^1.0.2",
     "lodash": "^4.17.21",
     "try2catch": "0.0.8",
-    "twilio": "^4.7.2",
+    "twilio": "^3.77.2",
     "twilio-flex-token-validator": "^1.5.6"
   },
   "devDependencies": {

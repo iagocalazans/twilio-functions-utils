@@ -109,7 +109,7 @@ Separate your actions from the main routine of the code. Break it down into seve
 ```js
 // File: assets/create.private.js
 
-const { Result } = require('twilio-functions-utils');
+const { Try } = require('twilio-functions-utils');
 
 /**
  * Here you can acess  Twilio Client as client and Context as env (so you can get env vars).
@@ -120,7 +120,7 @@ const { Result } = require('twilio-functions-utils');
 exports.create = async function (event) {
   const { client, env } = this
 
-  return Result.ok(await new Promise((resolve, reject) => {
+  return Try.promise(new Promise((resolve, reject) => {
     const random = Math.random();
 
     if (random >= 0.5) {
@@ -162,13 +162,13 @@ const { create } = require(Runtime.getAssets()['/create.js'].path)
  */
 async function createAction(event) {
   const { cookies, request, env } = this
-  const providerResult = await this.providers.create(event)
+  const createTry = await this.providers.create(event)
 
-  if (providerResult.isError) {
-    return new BadRequestError(providerResult.error);
+  if (createTry.isError) {
+    return new BadRequestError(createTry.error);
   }
 
-  return new Response(providerResult.data, 201);
+  return new Response(createTry.data, 201);
 }
 
 exports.handler = useInjection(createAction, {
@@ -205,50 +205,42 @@ console.log(typeArray) // Array
 console.log(original) // object
 ```
 
-### # Result <sup><sub>Class</sub></sup>
+### # Try <sup><sub>Static</sub></sup>
 
-The Result class provides an organized and simple way to return errors without having to wrap every request in Try Catches.
+The Try class provides an organized and simple way to return errors without having to wrap every request in Try Catches.
 
 #### Methods
 
-##### Result.ok(data)
+##### Try.promise(data)
 
-Use the `.ok` method to create a new Result instance with a data property and isError `false`.
+Use the `.promise` method to create a new Try instance with a promised data property and isError `false`.
 
-###### [Result.ok] data <sup><sub>*</sub></sup>
+###### [Try.promise] data <sup><sub>Promise<*></sub></sup>
 
-The data value could be of any of the primitives types that javascript accpets.
-
-##### Result.failed(error)
-
-Use the `.failed` method to create a new Result instance with an error property and isError `true`.
-
-###### [Result.failed] error <sup><sub>(Error|*)</sub></sup>
-
-The data value must be preferably of Error type, but you can use any of the primitive ones...
+The data value could be of any of the primitives types that javascript accpets incapsulated by a Promise.
 
 #### Properties
 
-##### Result.isError
+##### Try.isError
 
-A boolean propety that return true when Result contain a defined error value.
+A boolean propety that return true when Try contain a defined error value.
 
-##### Result.data
+##### Try.data
 
 The successfully returned value.
 
-##### Result.error
+##### Try.error
 
-An Error like object throwed by the "action" as result.
+An Error like object throwed by the "action" as Try.
 
 #### Usage
 
 ```js
-const result = Result.ok(value);
+const result = Try.promise(value);
 // or
-const result = Result.ok(await value);
+const result = Try.success(value);
 // or
-const result = Result.failed(error);
+const result = Try.failed(error);
 
 
 if (result.isError) {
