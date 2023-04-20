@@ -109,7 +109,7 @@ Separate your actions from the main routine of the code. Break it down into seve
 ```js
 // File: assets/create.private.js
 
-const { Try } = require('twilio-functions-utils');
+const { Try } = require('try2catch');
 
 /**
  * Here you can acess  Twilio Client as client and Context as env (so you can get env vars).
@@ -161,14 +161,15 @@ const { create } = require(Runtime.getAssets()['/create.js'].path)
  * @this CreateActionThis
  */
 async function createAction(event) {
-  const { cookies, request, env } = this
-  const createTry = await this.providers.create(event)
+  const { cookies, request, env, ...attributes } = this
 
-  if (createTry.isError) {
-    return new BadRequestError(createTry.error);
+  const promisify = await this.providers.create(attributes);
+
+  if (promisify.isError()) {
+    return new BadRequestError(promisify.error);
   }
 
-  return new Response(createTry.data, 201);
+  return new Response(promisify.data.sid, 200);
 }
 
 exports.handler = useInjection(createAction, {
@@ -203,51 +204,6 @@ const original = typeof ['one', 'two']
 console.log(type) // String
 console.log(typeArray) // Array
 console.log(original) // object
-```
-
-### # Try <sup><sub>Static</sub></sup>
-
-The Try class provides an organized and simple way to return errors without having to wrap every request in Try Catches.
-
-#### Methods
-
-##### Try.promise(data)
-
-Use the `.promise` method to create a new Try instance with a promised data property and isError `false`.
-
-###### [Try.promise] data <sup><sub>Promise<*></sub></sup>
-
-The data value could be of any of the primitives types that javascript accpets incapsulated by a Promise.
-
-#### Properties
-
-##### Try.isError
-
-A boolean propety that return true when Try contain a defined error value.
-
-##### Try.data
-
-The successfully returned value.
-
-##### Try.error
-
-An Error like object throwed by the "action" as Try.
-
-#### Usage
-
-```js
-const result = Try.promise(value);
-// or
-const result = Try.success(value);
-// or
-const result = Try.failed(error);
-
-
-if (result.isError) {
-  return new BadRequestError(result.error)
-}
-
-return new Response(result.data)
 ```
 
 ## TESTING
