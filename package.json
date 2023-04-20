@@ -1,6 +1,6 @@
 {
   "name": "twilio-functions-utils",
-  "version": "2.5.3",
+  "version": "2.5.4",
   "description": "Twilio Functions utils library",
   "main": "index.js",
   "types": "./types/twilio-functions-utils",
