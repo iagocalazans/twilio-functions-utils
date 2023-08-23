@@ -30,37 +30,16 @@ const responseTypes = {
 };
 
 function useItToMock(event) {
-  const provided = this.providers.useItAsProvider(event);
-
   if (event.forceFail) {
     throw new Error('Check fail condition!');
   }
 
-  return responseTypes[provided.type](provided);
+  return responseTypes[event.type]('provided');
 }
 
-function useItAsProvider(event) {
-  Object.defineProperty(
-    event, 'evaluated', {
-      value: true,
-      enumerable: true,
-    },
-  );
-
-  return event;
-}
-
-const fn = useInjection(useItToMock, {
-  providers: {
-    useItAsProvider,
-
-  },
-});
+const fn = useInjection(useItToMock);
 
 const fnWithToken = useInjection(useItToMock, {
-  providers: {
-    useItAsProvider,
-  },
   validateToken: true,
 });
 
