@@ -34,7 +34,7 @@ function useItToMock(event) {
     throw new Error('Check fail condition!');
   }
 
-  return responseTypes[event.type]('provided');
+  return responseTypes[event.type](event || 'provided');
 }
 
 const fn = useInjection(useItToMock);
@@ -112,7 +112,7 @@ describe('Function useInjection', () => {
   });
   it('Should respond with a Response Instance', async () => {
     const callback = await fn(
-      twilioContext, { type: 'response' }, twilioCallback,
+      twilioContext, { evaluated: true, type: 'response' }, twilioCallback,
     );
 
     expect(callback).toBeInstanceOf(Response);
