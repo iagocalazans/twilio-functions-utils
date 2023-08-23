@@ -166,7 +166,7 @@ describe('Function useMock', () => {
       await Runtime.getSync().maps('SN****').syncMapItems.create({ data: { notToTeste: 'something' } });
     } catch (err) {
       expect(err).toBeInstanceOf(Error);
-      expect(err.message).toMatch("Required parameter \"params['key']\" missing.");
+      expect(err.message).toMatch("Required parameter \"opts['key']\" missing.");
     }
   });
 
