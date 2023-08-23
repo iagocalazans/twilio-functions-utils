@@ -58,6 +58,10 @@ export class BadRequestError {
     [Symbol.toStringTag]: string;
 }
 
-export function remap<Z, X, Y = unknown>(action: (arg: Z) => Promise<X[]>, model: (el: X) => Y): (arg: Z) => Promise<Y[]>
+export function transformListTo<Z, X, Y = unknown>(action: (arg: Z) => Promise<X[]>, model: (el: X) => Y): (arg: Z) => Promise<Y[]>
+
+export function transformInstanceTo<Z, X, Y = unknown>(action: (arg: Z) => Promise<X>, model: (el: X) => Y): (arg: Z) => Promise<Y>
 
 export function extract<Z extends keyof X, X = unknown>(property: Z): (el: X) => Pick<X, Z>
+
+export function factory<Z = {[key in Z]: Z[key]; new (el: X): Z}, X = unknown>(Instance: Z): (el: X) => InstanceType<Z>

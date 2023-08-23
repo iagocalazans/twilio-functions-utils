@@ -1,8 +1,7 @@
 const { useInjection } = require('./lib/use.injection');
 const { typeOf } = require('./lib/typeof.function');
-const { remap } = require('./lib/remap.function');
-const { extract } = require('./lib/extract.function');
-const { get } = require('./lib/get.function');
+const { transformInstanceTo, transformListTo } = require('./lib/transformers');
+const { extract, factory } = require('./lib/utils.function');
 const { useMock } = require('./lib/use.mock');
 const { BadRequestError } = require('./lib/errors/bad-request.error');
 const { InternalServerError } = require('./lib/errors/internal-server.error');
@@ -21,7 +20,8 @@ module.exports = {
   NotFoundError,
   TwiMLResponse,
   UnauthorizedError,
-  remap,
-  get,
+  transformInstanceTo,
+  transformListTo,
   extract,
+  factory,
 };
