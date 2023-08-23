@@ -1,25 +1,19 @@
-import { Try } from 'try2catch'
+import { TwilioClient } from '@twilio-labs/serverless-runtime-types/types'
 
-export type useInjectionFn<T, V = any, X = any> = (this: {
-    providers: V, 
+export type useInjectionFn<T, X = {[key: string]: unknown}> = (this: {
+    env: X,
+    twilio: TwilioClient, 
     request: Record<string, string>, 
     cookies: Record<string, string>,
-    env: X
 }, event: T) => Promise<any> | any
 
 type useInjectionParams = {
-    providers: {
-        [key: string]: (...args: any[]) => Promise<unknown> | unknown
-    },
     validateToken: boolean
 }
 
 type useMockParams = {
-    providers: {
-        [key: string]: (...args: any[]) => Promise<unknown> | unknown
-    },
-    env: Record<string, any>,
-    client: Record<string, any>
+    env: {[key: string]: unknown},
+    twilio: TwilioClient
 }
 
 /**
@@ -64,4 +58,6 @@ export class BadRequestError {
     [Symbol.toStringTag]: string;
 }
 
-export { Try, typeOf }
+export function remap<Z, X, Y = unknown>(action: (arg: Z) => Promise<X[]>, model: (el: X) => Y): (arg: Z) => Promise<Y[]>
+
+export function extract<Z extends keyof X, X = unknown>(property: Z): (el: X) => Pick<X, Z>

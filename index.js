@@ -1,5 +1,8 @@
 const { useInjection } = require('./lib/use.injection');
 const { typeOf } = require('./lib/typeof.function');
+const { remap } = require('./lib/remap.function');
+const { extract } = require('./lib/extract.function');
+const { get } = require('./lib/get.function');
 const { useMock } = require('./lib/use.mock');
 const { BadRequestError } = require('./lib/errors/bad-request.error');
 const { InternalServerError } = require('./lib/errors/internal-server.error');
@@ -18,4 +21,7 @@ module.exports = {
   NotFoundError,
   TwiMLResponse,
   UnauthorizedError,
+  remap,
+  get,
+  extract,
 };
