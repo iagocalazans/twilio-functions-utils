@@ -65,3 +65,26 @@ export function transformInstanceTo<Z, X, Y = unknown>(action: (arg: Z) => Promi
 export function extract<Z extends keyof X, X = unknown>(property: Z): (el: X) => Pick<X, Z>
 
 export function factory<Z = {[key in Z]: Z[key]; new (el: X): Z}, X = unknown>(Instance: Z): (el: X) => InstanceType<Z>
+
+
+type FN = (...args: any[]) => any;
+type FnsMatchPipe<FNS extends FN[]> =
+  1 extends FNS["length"]
+    ? boolean
+    : FNS extends [
+        infer FN1st extends FN,
+        infer FN2nd extends FN,
+        ...infer FNRest extends FN[]
+      ]
+    ? Parameters<FN2nd> extends [ReturnType<FN1st>]
+      ? FnsMatchPipe<[FN2nd, ...FNRest]>
+      : never
+    : never;
+
+export function pipe<FNS extends FN[]>(...fns: FNS): FN {
+    return fns.reduce(
+      (result, f) =>
+        (...args) =>
+          f(result(...args))
+    );
+  }
