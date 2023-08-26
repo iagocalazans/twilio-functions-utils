@@ -54,6 +54,61 @@ When using Token Validator, the Request body must contain a valid Token from Twi
 }
 ```
 
+### # pipe(...functions) <sup><sub>Function</sub></sup>
+
+The pipe method could receive as many parameters as you desire. They will be called one after another.
+
+##### [pipe] ...functions <sup><sub>Function[]</sub></sup>
+
+Any sync function.
+
+##### [pipe] Usage
+
+```js
+  const sum1 = (x) => x + 1;
+  const sum2 = (x) => x + 2;
+  const sum3 = (x) => x + 3;
+
+  const sum = pipe(sum1, sum2, sum3);
+  const result = sum(1) // return 7
+```
+
+### # transformListTo(TwilioInstanceList, Function) <sup><sub>Function</sub></sup>
+
+The transformListTo method takes two parameters. The first to apply as a handler and the last is a transformation function.
+
+##### [transformListTo] TwilioInstanceList <sup><sub>TwilioInstanceList</sub></sup>
+
+A Twilio Instance List method as `twilio.calls.list` or `twilio.records.list`.
+
+##### [transformListTo] Function <sup><sub>Function</sub></sup>
+
+A transformation function. You could use one of lib defaults as `extract` or `factory`.
+
+##### [transformListTo] Usage
+
+```js
+  const sidList = await transformListTo(twilio.calls.list, extract('sid'))(); // returns ['CA****', 'CA****', 'CA****', 'CA****']
+```
+
+### # transformInstanceTo(TwilioInstance, Function) <sup><sub>Function</sub></sup>
+
+The transformInstanceTo method takes two parameters. The first to apply as a handler and the last is a transformation function.
+
+##### [transformInstanceTo] TwilioInstance <sup><sub>TwilioInstance</sub></sup>
+
+A Twilio Instance method as `twilio.calls` or `twilio.records`.
+
+##### [transformInstanceTo] Function <sup><sub>Function</sub></sup>
+
+A transformation function. You could use one of lib defaults as `extract` or `factory`.
+
+##### [transformInstanceTo] Usage
+
+```js
+  const sid = await transformInstanceTo(twilio.calls, extract('sid'))(); // returns 'CA****'
+```
+
 ### Response <sup><sub>Class</sub></sup>
 
 The responses coming from the function destined to the handler must be returned as an instance of Response.
