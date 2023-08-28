@@ -17,7 +17,7 @@ npm install twilio-functions-utils
 
 ## HOW IT WORKS
 
-The lib provides a function `useInjection` who returns a brand function for every execution. This returned function is ready to receive the Twilio Handler arguments and make them available as `this`  properties as `this.request`, `this.cookies`, `this.twilio`, `this.env` and `this.env` at the Function level.
+The lib provides a function `useInjection` who returns a brand function for every execution. This returned function is ready to receive the Twilio Handler arguments and make them available as `this`  properties as `this.request`, `this.cookies`, `this.twilio` and `this.env` at the Function level.
 
 ### # useInjection(Function, Options) <sup><sub>Function</sub></sup>
 
@@ -56,7 +56,7 @@ When using Token Validator, the Request body must contain a valid Token from Twi
 
 ### # pipe(...functions) <sup><sub>Function</sub></sup>
 
-The pipe method could receive as many parameters as you desire. They will be called one after another.
+The pipe method could receive as many parameters as you desire. They will be called one after another. For async methods use `pipeAsync`.
 
 ##### [pipe] ...functions <sup><sub>Function[]</sub></sup>
 
@@ -71,6 +71,10 @@ Any sync function.
 
   const sum = pipe(sum1, sum2, sum3);
   const result = sum(1) // return 7
+
+  // For async methods:
+  const asyncPiped = pipeAsync(async1, async2, async3);
+  const result = await asyncPiped(1) // return Promise { YOUR-VALUE }
 ```
 
 ### # transformListTo(TwilioInstanceList, Function) <sup><sub>Function</sub></sup>
@@ -209,6 +213,30 @@ const original = typeof ['one', 'two']
 console.log(type) // String
 console.log(typeArray) // Array
 console.log(original) // object
+```
+
+### # factory(Class) <sup><sub>Function</sub></sup>
+
+A Factory method for your desired Class. It returns a function that works as the Class constructor and receive the Class constructor params.
+
+##### [factory] Class <sup><sub>Prototype</sub></sup>
+
+Could be any JavaScript primitive value to be type checked.
+
+#### Usage
+
+```js
+class CustomCall {
+  constructor({ from, to, price }) {
+    this.from = from;
+    this.to = to;
+    this.price = price;
+  }
+}
+
+const customCallFactory = factory(CustomCall);
+const call = customCallFactory({ from: '+987566498965', to: '+485797955646', price: 65 })
+console.log(call.price) // return 65
 ```
 
 ## TESTING
