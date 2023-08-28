@@ -88,7 +88,8 @@ A transformation function. You could use one of lib defaults as `extract` or `fa
 ##### [transformListTo] Usage
 
 ```js
-  const sidList = await transformListTo(twilio.calls.list, extract('sid'))(); // returns ['CA****', 'CA****', 'CA****', 'CA****']
+  const getCallSidList = transformListTo(twilio.calls.list, extract('sid')); 
+  const callSidList = await getCallSidList(); // returns ['CA****', 'CA****', 'CA****', 'CA****']
 ```
 
 ### # transformInstanceTo(TwilioInstance, Function) <sup><sub>Function</sub></sup>
@@ -106,7 +107,8 @@ A transformation function. You could use one of lib defaults as `extract` or `fa
 ##### [transformInstanceTo] Usage
 
 ```js
-  const sid = await transformInstanceTo(twilio.calls, extract('sid'))(); // returns 'CA****'
+  const getToNumber = transformInstanceTo(twilio.calls, extract('to'));
+  const toNumber = await getToNumber('CA****'); // returns "+956798915489"
 ```
 
 ### Response <sup><sub>Class</sub></sup>
