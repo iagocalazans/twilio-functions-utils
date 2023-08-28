@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "jest --coverage && coveralls < coverage/lcov.info",
+    "test:dev": "jest --coverage --watchAll",
     "lint": "eslint --fix index.js lib/",
     "docs": "./node_modules/.bin/jsdoc -c jsdoc.json"
   },
