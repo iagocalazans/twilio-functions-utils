@@ -1,6 +1,8 @@
 const { useInjection } = require('./lib/use.injection');
 const { typeOf } = require('./lib/typeof.function');
-const { transformInstanceTo, transformListTo, pipe } = require('./lib/transformers');
+const {
+  transformInstanceTo, transformListTo, pipe, pipeAsync,
+} = require('./lib/transformers');
 const { extract, factory } = require('./lib/utils.function');
 const { useMock } = require('./lib/use.mock');
 const { BadRequestError } = require('./lib/errors/bad-request.error');
@@ -23,6 +25,7 @@ module.exports = {
   transformInstanceTo,
   transformListTo,
   pipe,
+  pipeAsync,
   extract,
   factory,
 };
