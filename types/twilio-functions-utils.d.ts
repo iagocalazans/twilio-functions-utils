@@ -20,7 +20,7 @@ type useMockParams = {
  * The useInjection method takes two parameters. The first to apply as a handler and the last is an object of configuration options.
  * It reduces the need to apply frequent try-catches and improving context management, making it no longer necessary to return the callback() method in all functions.
  */
-export function useInjection<T>(fn: useInjectionFn<T>, params: useInjectionParams): (...args: any[]) => Promise<any> | any;
+export function useInjection<T, X>(fn: useInjectionFn<T, X>, params: useInjectionParams): (...args: unknown[]) => Promise<void> | void;
 
 export function useMock<T>(fn: useInjectionFn<T>, params: useMockParams): (...args: any[]) => Promise<any> | any;
 
@@ -68,6 +68,8 @@ export function factory<Z = {[key in Z]: Z[key]; new (el: X): Z}, X = unknown>(I
 
 
 type FN = (...args: any[]) => any;
+type FNA = (...args: unknown[]) => Promise<unknown>;
+
 type FnsMatchPipe<FNS extends FN[]> =
   1 extends FNS["length"]
     ? boolean
@@ -88,3 +90,11 @@ export function pipe<FNS extends FN[]>(...fns: FNS): FN {
           f(result(...args))
     );
   }
+  
+export function pipeAsync<FNS extends FNA[]>(...fns: FNS): FNA {
+  return fns.reduce(
+    (result, f) =>
+      async (...args) =>
+        f(await result(...args))
+  );
+}

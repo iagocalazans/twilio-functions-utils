@@ -1,4 +1,5 @@
 .vscode/
+.github/
 jest.config.js
 .eslintrc.js
 .gitignore
@@ -10,3 +11,4 @@ coverage/
 .env
 jsdoc.json
 docs/
+CHANGELOG.md
