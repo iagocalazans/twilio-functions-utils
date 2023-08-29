@@ -1,4 +1,4 @@
-const { useInjection } = require('./lib/use.injection');
+const { useInjection, useTwilio, TWILIO_TYPES } = require('./lib/use.injection');
 const { typeOf } = require('./lib/typeof.function');
 const {
   transformInstanceTo, transformListTo, pipe, pipeAsync,
@@ -28,4 +28,6 @@ module.exports = {
   pipeAsync,
   extract,
   factory,
+  useTwilio,
+  TWILIO_TYPES,
 };
