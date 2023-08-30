@@ -5,7 +5,7 @@
 
 ## ABOUT
 
-![npm](https://img.shields.io/npm/v/twilio-functions-utils?color=white&label=version&logo=npm&style=for-the-badge) ![npm](https://img.shields.io/npm/dw/twilio-functions-utils?color=white&logo=npm&style=for-the-badge) ![npms.io (final)](https://img.shields.io/npms-io/final-score/twilio-functions-utils?color=white&label=score&logo=npm&logoColor=white&style=for-the-badge) ![Coveralls](https://img.shields.io/coveralls/github/iagocalazans/twilio-functions-utils?color=white&logo=coveralls&style=for-the-badge)
+![npm](https://img.shields.io/npm/v/twilio-functions-utils?color=white&label=version&logo=npm&style=for-the-badge) ![npm](https://img.shields.io/npm/dw/twilio-functions-utils?color=white&logo=npm&style=for-the-badge) ![Coveralls](https://img.shields.io/coveralls/github/iagocalazans/twilio-functions-utils?color=white&logo=coveralls&style=for-the-badge)
 
 This lib was created with the aim of simplifying the use of serverless Twilio, reducing the need to apply frequent try-catches and improving context management, making it no longer necessary to return the callback() method in all functions.
 
@@ -19,7 +19,7 @@ npm install twilio-functions-utils
 
 The lib provides a function `useInjection` who returns a brand function for every execution. This returned function is ready to receive the Twilio Handler arguments and make them available as `this`  properties as `this.request`, `this.cookies`, `this.twilio` and `this.env` at the Function level.
 
-### # useInjection(Function, Options) <sup><sub>Function</sub></sup>
+## # useInjection(Function, Options) <sup><sub>Function</sub></sup>
 
 The useInjection method takes two parameters. The first to apply as a handler and the last is an object of configuration options.
 
@@ -54,7 +54,49 @@ When using Token Validator, the Request body must contain a valid Token from Twi
 }
 ```
 
-### # pipe(...functions) <sup><sub>Function</sub></sup>
+## # useTwilioImport(objectThis) <sup><sub>Function</sub></sup>
+
+This captures the this object and prepare it for optimizing imports from Twilio Functions as `Runtime.getFunctions()[path].path`.
+
+##### [useTwilioImport] objectThis <sup><sub>This</sub></sup>
+
+The injected through handler function `this` object.
+
+##### [useTwilioImport] Usage
+
+The common way to import a function is like this:
+
+```js
+  // In other way the code with Twilio should be like this.
+  const { functionToImportName: functionThatUsesTwilio } = require(Runtime.getFunctions()['path-to-your-function'].path)
+```
+
+And with the `useTwilioImport` function you should start doing like this:
+
+```js
+export const yourHandlerFunction = async function (event) {
+  const { prop1, prop2 } = event;
+
+  const twilio = useTwilioImport(this);
+
+  const functionThatUsesTwilio = twilio(
+    TWILIO_TYPES.Functions, // Could be "TWILIO_TYPES.Assets"
+    'functionToImportName',
+    'path-to-your-function'
+  );
+
+  const result = await functionThatUsesTwilio({ [prop1]: prop2 });
+```
+
+When using this approach your `functionToImportName` have an object `this` with `{ twilio: TwilioClient }`.
+
+```js
+  async function functionThatUsesTwilio (prop) {
+    return this.twilio.sync.v1 // And the rest of your code.
+  }
+```
+
+## # pipe(...functions) <sup><sub>Function</sub></sup>
 
 The pipe method could receive as many parameters as you desire. They will be called one after another. For async methods use `pipeAsync`.
 
@@ -77,7 +119,7 @@ Any sync function.
   const result = await asyncPiped(1) // return Promise { YOUR-VALUE }
 ```
 
-### # transformListTo(TwilioInstanceList, Function) <sup><sub>Function</sub></sup>
+## # transformListTo(TwilioInstanceList, Function) <sup><sub>Function</sub></sup>
 
 The transformListTo method takes two parameters. The first to apply as a handler and the last is a transformation function.
 
@@ -96,7 +138,7 @@ A transformation function. You could use one of lib defaults as `extract` or `fa
   const callSidList = await getCallSidList(); // returns ['CA****', 'CA****', 'CA****', 'CA****']
 ```
 
-### # transformInstanceTo(TwilioInstance, Function) <sup><sub>Function</sub></sup>
+## # transformInstanceTo(TwilioInstance, Function) <sup><sub>Function</sub></sup>
 
 The transformInstanceTo method takes two parameters. The first to apply as a handler and the last is a transformation function.
 
@@ -150,7 +192,7 @@ const enqueueVoice = twimlVoice
 return new TwiMLResponse(twimlVoice, 201)
 ```
 
-#### Usage
+### Usage
 
 **IMPORTANT TO USE REGULAR FUNCTIONS** ➜ With arrow functions it doesn't work as expected as `this` cannot be injected correctly.
 
