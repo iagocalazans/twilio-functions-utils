@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 /* global jest, describe, it, expect, Runtime, Twilio */
 
 require('../lib/twilio.mock');
@@ -14,6 +15,7 @@ const {
   NotFoundError,
   UnauthorizedError,
 } = require('../index');
+const { useTwilio, TWILIO_TYPES } = require('../lib/use.injection');
 
 const responseTypes = {
   twiml: (provided) => new TwiMLResponse(provided.twiml),
@@ -24,27 +26,7 @@ const responseTypes = {
   responseAsString: (provided) => new Response(provided.message),
 };
 
-const { functionUsedToTest } = require(Runtime.getFunctions()['use-to-test'].path);
 const { assetUsedToTest } = require(Runtime.getAssets()['/use-to-test.js'].path);
-
-async function useItToMock(event) {
-  const provided = this.providers.useItAsProvider(event);
-
-  if (event.forceFail) {
-    throw new Error('Check fail condition!');
-  }
-
-  if (event.forceUnauthorized) {
-    // eslint-disable-next-line no-throw-literal
-    throw 'forceUnauthorized condition!';
-  }
-
-  const reprovided = await this.providers
-    .functionUsedToTest(this.providers
-      .assetUsedToTest(event));
-
-  return responseTypes[provided.type](reprovided);
-}
 
 function useItAsProvider(event) {
   Object.defineProperty(
@@ -57,12 +39,28 @@ function useItAsProvider(event) {
   return event;
 }
 
+async function useItToMock(event) {
+  const provided = useItAsProvider(event);
+
+  if (event.forceFail) {
+    throw new Error('Check fail condition!');
+  }
+
+  if (event.forceUnauthorized) {
+    // eslint-disable-next-line no-throw-literal
+    throw 'forceUnauthorized condition!';
+  }
+
+  const twilio = useTwilio(this);
+
+  const result = await twilio(
+    TWILIO_TYPES.Functions, 'functionUsedToTest', 'use-to-test',
+  )(assetUsedToTest(event));
+
+  return responseTypes[provided.type](result);
+}
+
 const fn = useMock(useItToMock, {
-  providers: {
-    useItAsProvider,
-    functionUsedToTest,
-    assetUsedToTest,
-  },
   env: {
     SOMETEST_VAR: 'VariableDefined',
   },
@@ -76,6 +74,7 @@ describe('Function useMock', () => {
         sid: 'CA****', account_sid: 'AC****', to: '+55***********', from: '+55***********', parent_call_sid: 'CA****',
       },
     });
+
     const callback = await fn({
       type: 'internalServer', forceFail: false, to: '+55***********', from: '+55***********',
     });

@@ -1,6 +1,6 @@
-const functionUsedToTest = async function (event) {
+async function functionUsedToTest(event) {
   if (event.to && event.from) {
-    const call = await this.client.calls.create({
+    const call = await this.twilio.calls.create({
       from: event.from,
       to: event.to,
     });
@@ -9,7 +9,7 @@ const functionUsedToTest = async function (event) {
   }
 
   return event;
-};
+}
 
 module.exports = {
   functionUsedToTest,
