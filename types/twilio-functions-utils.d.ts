@@ -1,10 +1,10 @@
-import { TwilioClient } from '@twilio-labs/serverless-runtime-types/types'
+import { Twilio } from 'twilio'
 
 export type useInjectionFn<T, X = {[key: string]: unknown}, Z = {[key: string]: unknown}> = (this: ObjectThis<X, Z>, event: T) => Promise<any> | any
 
 export type ObjectThis<T = unknown, X = Record<string, string>> = {
   env: T,
-  twilio: TwilioClient, 
+  twilio: Twilio, 
   request: Record<string, string>, 
   cookies: X,
 }
@@ -15,7 +15,7 @@ type useInjectionParams = {
 
 type useMockParams = {
     env: {[key: string]: unknown},
-    twilio: TwilioClient
+    twilio: Twilio
 }
 
 /**
@@ -62,7 +62,7 @@ export class BadRequestError {
 
 export function transformListTo<Z, X, Y = unknown>(action: (arg: Z) => Promise<X[]>, model: (el: X) => Y): (arg: Z) => Promise<Y[]>
 
-export function transformInstanceTo<Z, X, Y = unknown>(action: (arg: Z) => Promise<X>, model: (el: X) => Y): (arg: Z) => Promise<Y>
+export function transformInstanceTo<T = (arg: Z) => {fetch: () => Promise<X>, [key: string]: unknown}, Z = string, X, Y = unknown>(action: T, model: (el: X) => Y): (arg: Z) => Promise<Y>
 
 export function extract<Z extends keyof X, X = unknown>(property: Z): (el: X) => Pick<X, Z>
 
@@ -106,6 +106,6 @@ export const TWILIO_TYPES = {
   Assets: 'asset',
 }
 
-export const useTwilioImport = <T = {twilio: TwilioClient}>(objectThis: T) => (type: TWILIO_TYPES, name: string, path: string) => {
+export const useTwilioImport = <T extends {twilio: Twilio}>(objectThis: T) => (type: TWILIO_TYPES, name: string, path: string) => {
     return function <X = any[], Z = any>(this: T, ...args: X): Promise<Z> {}
   }
