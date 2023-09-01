@@ -107,6 +107,4 @@ export const TWILIO_TYPES = {
   Assets: 'asset',
 }
 
-export const useTwilioImport = <T extends {twilio: Twilio}>(objectThis: T) => (type: TWILIO_TYPES, name: string, path: string) => {
-    return function <X = any[], Z = any>(this: T, ...args: X): Promise<Z> {}
-  }
+export const useTwilioImport = <T = {twilio: Twilio}, X = any[], Z = any>(objectThis: T) => (type: TWILIO_TYPES, name: string, path: string) => (function (...args: X): Promise<Z> {}).bind(objectThis) 
