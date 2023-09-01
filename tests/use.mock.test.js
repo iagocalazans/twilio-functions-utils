@@ -15,7 +15,7 @@ const {
   NotFoundError,
   UnauthorizedError,
 } = require('../index');
-const { useTwilio, TWILIO_TYPES } = require('../lib/use.injection');
+const { useTwilioImport, TWILIO_TYPES } = require('../lib/use.injection');
 
 const responseTypes = {
   twiml: (provided) => new TwiMLResponse(provided.twiml),
@@ -51,7 +51,7 @@ async function useItToMock(event) {
     throw 'forceUnauthorized condition!';
   }
 
-  const twilio = useTwilio(this);
+  const twilio = useTwilioImport(this);
 
   const result = await twilio(
     TWILIO_TYPES.Functions, 'functionUsedToTest', 'use-to-test',
