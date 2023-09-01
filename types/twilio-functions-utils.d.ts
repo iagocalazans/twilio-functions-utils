@@ -1,3 +1,4 @@
+import { Context, ServerlessCallback } from '@twilio-labs/serverless-runtime-types/types'
 import { Twilio } from 'twilio'
 
 export type useInjectionFn<T, X = {[key: string]: unknown}, Z = {[key: string]: unknown}> = (this: ObjectThis<X, Z>, event: T) => Promise<any> | any
@@ -22,9 +23,9 @@ type useMockParams = {
  * The useInjection method takes two parameters. The first to apply as a handler and the last is an object of configuration options.
  * It reduces the need to apply frequent try-catches and improving context management, making it no longer necessary to return the callback() method in all functions.
  */
-export function useInjection<T, X, Z>(fn: useInjectionFn<T, X, Z>, params: useInjectionParams): (...args: unknown[]) => Promise<void> | void;
+export function useInjection<T, X extends { DOMAIN_NAME: string; PATH: string; SERVICE_SID: string | undefined; ENVIRONMENT_SID: string | undefined }, Z>(fn: useInjectionFn<T, X, Z>, opts: useInjectionParams): (context: Context, event: T, callback: ServerlessCallback) => Promise<void>;
 
-export function useMock<T>(fn: useInjectionFn<T>, params: useMockParams): (...args: any[]) => Promise<any> | any;
+export function useMock<T>(fn: useInjectionFn<T>, opts: useMockParams): (...args: any[]) => Promise<any> | any;
 
 export class TwiMLResponse {
     constructor(body?: string, statusCode?: number);
