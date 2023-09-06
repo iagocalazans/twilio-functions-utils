@@ -1,8 +1,9 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable max-classes-per-file */
 /* global describe, it, expect */
 
 const {
-  transformListTo, transformInstanceTo, pipe, pipeAsync,
+  transformListTo, transformInstanceTo, pipe, pipeAsync, retryAsync,
 } = require('../lib/transformers');
 const { extract, factory } = require('../lib/utils.function');
 
@@ -42,6 +43,29 @@ describe('Functional Transformers', () => {
 
       expect(soldier).toBeInstanceOf(Soldier);
       expect(soldier.name).toBe('Twilio');
+    });
+  });
+
+  describe('retry', () => {
+    it('should retry for four times before return', async () => {
+      const trier4 = (body) => new Promise((s, f) => {
+        body.actual += 1;
+        body.actual < 4 ? f() : s(body);
+      });
+
+      const retrier4 = retryAsync(4);
+
+      expect(retrier4({ actual: 1 }, trier4)).resolves.toEqual({ actual: 4 });
+    });
+
+    it('should execute for five times and only retry four achieving max attempts', async () => {
+      const trier6 = (body) => new Promise((s, f) => {
+        f(new Error(`Maximum ${body.actual} attempts achieved`));
+        body.actual += 1;
+      });
+
+      const retrier4 = retryAsync(4);
+      expect(retrier4({ actual: 1 }, trier6)).rejects.toEqual(Error('Maximum 4 attempts achieved'));
     });
   });
 
