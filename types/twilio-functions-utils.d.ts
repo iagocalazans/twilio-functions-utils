@@ -67,24 +67,15 @@ export function transformInstanceTo<T = (arg: Z) => {fetch: () => Promise<X>, [k
 
 export function extract<Z extends keyof X, X = unknown>(property: Z): (el: X) => Pick<X, Z>
 
-export function factory<Z = {[key in Z]: Z[key]; new (el: X): Z}, X = unknown>(Instance: Z): (el: X) => InstanceType<Z>
+export function factory<Z = {new (el: X): Z, [key in Z]: Z[key]}, X = unknown>(Instance: Z): (el: X) => InstanceType<Z>
 
 
 type FN = (...args: any[]) => any;
 type FNA = (...args: unknown[]) => Promise<unknown>;
+type FNSFull = [infer FN1st extends FN ? FN1st : FN, infer FN2nd extends FN ? FN2nd : FN, ...infer FNRest extends FN ? FNRest : FN]
 
 type FnsMatchPipe<FNS extends FN[]> =
-  1 extends FNS["length"]
-    ? boolean
-    : FNS extends [
-        infer FN1st extends FN,
-        infer FN2nd extends FN,
-        ...infer FNRest extends FN[]
-      ]
-    ? Parameters<FN2nd> extends [ReturnType<FN1st>]
-      ? FnsMatchPipe<[FN2nd, ...FNRest]>
-      : never
-    : never;
+  1 extends FNS["length"] ? boolean : FNS extends FNSFull ? Parameters<FN2nd> extends [ReturnType<FN1st>] ? FnsMatchPipe<[FN2nd, ...FNRest]> : never : never;
 
 export function pipe<FNS extends FN[]>(...fns: FNS): FN {
     return fns.reduce(
