@@ -1,6 +1,6 @@
 {
   "name": "twilio-functions-injector",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Twilio Functions Utility Library",
   "main": "index.js",
   "types": "./types/twilio-functions-utils",
