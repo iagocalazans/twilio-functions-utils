@@ -11,23 +11,25 @@ const { NotFoundError } = require('./lib/errors/not-found.error');
 const { UnauthorizedError } = require('./lib/errors/unauthorized.error');
 const { Response } = require('./lib/responses/default.response');
 const { TwiMLResponse } = require('./lib/responses/twiml.response');
+const { dispatch } = require('./lib/dispatch.function');
 
 module.exports = {
+  dispatch,
+  extract,
+  factory,
+  pipe,
+  pipeAsync,
+  transformListTo,
+  transformInstanceTo,
   typeOf,
   useMock,
   useInjection,
-  Response,
+  useTwilioImport,
   BadRequestError,
-  InternalServerError,
   NotFoundError,
+  InternalServerError,
+  Response,
   TwiMLResponse,
   UnauthorizedError,
-  transformInstanceTo,
-  transformListTo,
-  pipe,
-  pipeAsync,
-  extract,
-  factory,
-  useTwilioImport,
   TWILIO_TYPES,
 };
