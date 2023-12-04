@@ -1,4 +1,11 @@
 const { Try } = require('try2catch');
+const {
+  CustomWidget,
+  Compare,
+  Flow,
+  SetVariable,
+  Split,
+} = require('declarative-based-flow');
 const { BadRequestError } = require('./lib/errors/bad-request.error');
 const { InternalServerError } = require('./lib/errors/internal-server.error');
 const { NotFoundError } = require('./lib/errors/not-found.error');
@@ -43,5 +50,10 @@ module.exports = {
   TwiMLResponse,
   UnauthorizedError,
   Try,
+  CustomWidget,
+  Compare,
+  Flow,
+  SetVariable,
+  Split,
   TWILIO_TYPES,
 };
