@@ -1,6 +1,6 @@
 {
   "name": "twilio-functions-utils",
-  "version": "2.4.3",
+  "version": "2.4.4",
   "description": "Twilio Functions utils library",
   "main": "index.js",
   "types": "./types/twilio-functions-utils",
@@ -45,6 +45,7 @@
   "dependencies": {
     "@folder/readdir": "^3.1.0",
     "@twilio/runtime-handler": "^1.2.3",
+    "declarative-based-flow": "^0.0.15",
     "lodash": "^4.17.21",
     "try2catch": "0.0.8",
     "twilio": "^3.77.2",
@@ -52,13 +53,13 @@
   },
   "devDependencies": {
     "@twilio-labs/serverless-runtime-types": "^2.2.3",
-    "jsdoc": "^3.6.11",
     "better-docs": "^2.7.2",
     "coveralls": "^3.1.1",
     "eslint": "^8.14.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
     "jest": "^28.0.3",
+    "jsdoc": "^3.6.11",
     "twilio-run": "^3.4.2"
   },
   "engines": {
