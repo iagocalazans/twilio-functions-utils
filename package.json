@@ -56,14 +56,20 @@
   "devDependencies": {
     "@twilio-labs/serverless-runtime-types": "^2.2.3",
     "@types/lodash": "^4.14.202",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/parser": "^6.15.0",
     "better-docs": "^2.7.2",
     "coveralls": "^3.1.1",
-    "eslint": "^8.14.0",
+    "eslint": "^8.0.1",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.26.0",
+    "eslint-config-standard-with-typescript": "^43.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
+    "eslint-plugin-promise": "^6.0.0",
     "jest": "^28.0.3",
     "jsdoc": "^3.6.11",
-    "twilio-run": "^3.4.2"
+    "twilio-run": "^3.4.2",
+    "typescript": "*"
   },
   "engines": {
     "node": ">=14"

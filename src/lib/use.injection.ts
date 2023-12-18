@@ -1,40 +1,40 @@
-/* global Runtime */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/strict-boolean-expressions */
 /* eslint-disable global-require */
-import * as flexTokenValidator from 'twilio-flex-token-validator';
+import * as flexTokenValidator from 'twilio-flex-token-validator'
+import _ from 'lodash'
+
+import { InternalServerError } from './errors/internal-server.error'
+import { UnauthorizedError } from './errors/unauthorized.error'
+import { type Twilio } from 'twilio'
+import { type ServerlessCallback } from '@twilio-labs/serverless-runtime-types/types'
 const { validator } = flexTokenValidator
-import  _ from 'lodash';
 
-import { InternalServerError }  from './errors/internal-server.error';
-import { UnauthorizedError } from './errors/unauthorized.error';
-import { Twilio } from 'twilio';
-import { ServerlessCallback } from '@twilio-labs/serverless-runtime-types/types';
-
-export type InjectorThis<Env extends EnvironmentVars, Providers> = {
-  request: Record<string, any>;
-  cookies: Record<string, any>;
-  env: Omit<InjectionContext<Env>, "getTwilioClient">;
-  providers: Providers;
+export interface InjectorThis<Env extends EnvironmentVars, Providers> {
+  request: Record<string, any>
+  cookies: Record<string, any>
+  env: Omit<InjectionContext<Env>, 'getTwilioClient'>
+  providers: Providers
 }
 
-export type InjectorFunction<Event, Env extends EnvironmentVars = Record<string, any>, Providers extends ProvidersList = any> = (this:InjectorThis<Env, Providers>, event: Event) => Promise<any>
+export type InjectorFunction<Event, Env extends EnvironmentVars = Record<string, any>, Providers extends ProvidersList = any> = (this: InjectorThis<Env, Providers>, event: Event) => Promise<any>
 
 export type ProviderFunction<Data extends unknown[] = any, Env extends EnvironmentVars = any> = (this: {
-  client: Twilio;
-  env: Omit<InjectionContext<Env>, "getTwilioClient">;
+  client: Twilio
+  env: Omit<InjectionContext<Env>, 'getTwilioClient'>
 }, ...event: Data) => any | Promise<any>
 
-type Event<Data, Req = {}, Cookies = {}> = {
+type Event<Data, Req = Record<string, any>, Cookies = Record<string, any>> = {
   [prop in keyof Data]: Data[prop];
-} & { Token: string;
-  request: Req;
-  cookies: Cookies; }
+} & { Token: string
+  request: Req
+  cookies: Cookies }
 
-type ProvidersList = {
-  [key: string]: ProviderFunction
-}
+type ProvidersList = Record<string, ProviderFunction>
 
-type InjectorOptions<Data extends Record< string, any>, Env extends EnvironmentVars> = {
-  providers?: ProvidersList,
+interface InjectorOptions {
+  providers?: ProvidersList
   validateToken?: boolean
 }
 
@@ -43,14 +43,13 @@ type EnvironmentVars<T = any> = {
   & { ACCOUNT_SID: string, AUTH_TOKEN: string }
 }
 
-type InjectionContext<T extends Record<string, any>> = 
+type InjectionContext<T extends Record<string, any>> =
 EnvironmentVars<T> & { getTwilioClient: () => Twilio }
 
-
 /**
- * The useInjection method takes two parameters. The first to apply as a 
+ * The useInjection method takes two parameters. The first to apply as a
  * handler and the last is an object of configuration options.
- * 
+ *
  * @param fn Must be writen in standard format, this will be your handler function.
  * @param params [useInjection] Options.providers Object
 An object that can contain providers that will be defined, which act as use cases to perform internal actions in the handler function through the this.providers method.
@@ -59,7 +58,7 @@ An object that can contain providers that will be defined, which act as use case
 You can pass validateToken equal true to force Flex Token validation using Twilio Flex Token Validator
  * @returns void
  * @example
- * 
+ *
  * async function createAction(event) {
  *   const { cookies, request, env } = this
  *   const createTry = await this.providers.create(event)
@@ -75,33 +74,35 @@ You can pass validateToken equal true to force Flex Token validation using Twili
  *    providers: {
  *      create,
  *    },
- *    validateToken: true, // When using Token Validator, the Request body must contain a valid Token from Twilio.
+ *  validateToken: true, // When using Token Validator, the Request body must contain a valid Token from Twilio.
  * });
  */
-export const useInjection = <Data = Record<string, any>, Env extends EnvironmentVars = Record<string, any>, Providers extends ProvidersList = any>(fn: InjectorFunction<Event<Data>, Env, Providers>, params: InjectorOptions<any, Env>) => async function (...args: [InjectionContext<Env>, Event<Data>, ServerlessCallback]) {
-  const [context, event, callback] = args;
-  const { getTwilioClient, ...env } = context;
+export const useInjection = <Data = Record<string, any>, Env extends EnvironmentVars = Record<string, any>, Providers extends ProvidersList = any>(fn: InjectorFunction<Event<Data>, Env, Providers>, params: InjectorOptions) => async function (...args: [InjectionContext<Env>, Event<Data>, ServerlessCallback]) {
+  const [context, event, callback] = args
+  const { getTwilioClient, ...env } = context
 
-  const providers = _.isUndefined(params?.providers)
-    || !_.isPlainObject(params?.providers)
-    ? {} : params.providers as ProvidersList
+  const providers = _.isUndefined(params?.providers) ||
+    !_.isPlainObject(params?.providers)
+    ? {}
+    : params.providers
 
-  const validateToken = _.isUndefined(params?.validateToken)
-    || _.isNull(params?.validateToken)
-    ? false : params.validateToken;
+  const validateToken = _.isUndefined(params?.validateToken) ||
+    _.isNull(params?.validateToken)
+    ? false
+    : params.validateToken
 
-  const client = getTwilioClient();
+  const client = getTwilioClient()
 
   const providerThat = {
     client,
-    env,
-  };
+    env
+  }
 
   const {
     request, cookies, Token, ...values
-  } = event;
+  } = event
 
-  const providerNames = Object.keys(providers);
+  const providerNames = Object.keys(providers)
 
   const that = {
     request,
@@ -111,31 +112,31 @@ export const useInjection = <Data = Record<string, any>, Env extends Environment
       Reflect.defineProperty(
         p, c, {
           value: providers[c].bind(providerThat),
-          enumerable: true,
-        },
-      );
-      return p;
-    }, {}),
-  };
+          enumerable: true
+        }
+      )
+      return p
+    }, {})
+  }
 
   try {
     if (validateToken && Token) {
       const validation: any = await validator(
-        Token, env.ACCOUNT_SID, env.AUTH_TOKEN,
-      );
+        Token, env.ACCOUNT_SID, env.AUTH_TOKEN
+      )
 
       if (!validation.valid) {
-        return callback(null, new UnauthorizedError(validation.message));
+        callback(null, new UnauthorizedError(validation.message)); return
       }
     }
 
-    //@ts-ignore
-    return callback(null, await fn.apply(that, [values]));
+    // @ts-expect-error
+    callback(null, await fn.apply(that, [values]))
   } catch (err: any) {
     if (typeof err === 'string') {
-      return callback(null, new UnauthorizedError(err));
+      callback(null, new UnauthorizedError(err)); return
     }
 
-    return callback(null, new InternalServerError(err.message));
+    callback(null, new InternalServerError(err.message))
   }
-};
+}

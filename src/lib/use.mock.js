@@ -2,39 +2,43 @@
 /* eslint-disable global-require */
 /* global Twilio, jest */
 
-const fs = require('fs');
+const fs = require('fs')
 
-const readdir = require('@folder/readdir');
-const path = require('path');
-const _ = require('lodash');
-const { UnauthorizedError } = require('./errors/unauthorized.error');
-const { InternalServerError } = require('./errors/internal-server.error');
+const readdir = require('@folder/readdir')
+const path = require('path')
+const _ = require('lodash')
+const { UnauthorizedError } = require('./errors/unauthorized.error')
+const { InternalServerError } = require('./errors/internal-server.error')
 
 if (process.env.NODE_ENV === 'test') {
   const functionsPath = fs.existsSync(path.join(
-    '.', 'src', 'functions',
-  )) ? './src/functions' : './functions';
+    '.', 'src', 'functions'
+  ))
+    ? './src/functions'
+    : './functions'
 
   const assetsPath = fs.existsSync(path.join(
-    '.', 'src', 'assets',
-  )) ? './src/assets' : './assets';
+    '.', 'src', 'assets'
+  ))
+    ? './src/assets'
+    : './assets'
 
   const functions = readdir.sync(functionsPath, {
     base: functionsPath,
     recursive: true,
-    nodir: true,
-  });
+    nodir: true
+  })
 
   const assets = readdir.sync(assetsPath, {
     base: assetsPath,
     recursive: true,
-    nodir: true,
-  });
+    nodir: true
+  })
 
-  const service = (Twilio.sync.services('default'));
+  const service = (Twilio.sync.services('default'))
 
-  service.maps = service.syncMaps;
-  service.lists = service.syncLists;
+  service.maps = service.syncMaps
+  service.lists = service.syncLists
 
   Object.defineProperty(
     global, 'Runtime', {
@@ -42,20 +46,20 @@ if (process.env.NODE_ENV === 'test') {
       get: () => ({
         getFunctions: jest.fn(() => (functions.reduce((p, c) => {
           p[`${c.replace(/\.protected\.js|\.protected\.ts/, '').replace(/\.private\.js|\.private\.ts/, '').replace(/\.js|\.ts/, '')}`] = {
-            path: path.resolve(functionsPath, c).replace(/\.js|\.ts/, ''),
-          };
-          return p;
+            path: path.resolve(functionsPath, c).replace(/\.js|\.ts/, '')
+          }
+          return p
         }, {}))),
         getSync: (_service) => service,
         getAssets: jest.fn(() => (assets.reduce((p, c) => {
           p[`/${c.replace(/\.private|\.private/, '')}`] = {
-            path: path.resolve(assetsPath, c).replace(/\.js|\.ts/, ''),
-          };
-          return p;
-        }, {}))),
-      }),
-    },
-  );
+            path: path.resolve(assetsPath, c).replace(/\.js|\.ts/, '')
+          }
+          return p
+        }, {})))
+      })
+    }
+  )
 
   /**
    * @param {function} fn
@@ -65,32 +69,35 @@ if (process.env.NODE_ENV === 'test') {
    * @param {object} [params.client]
    */
   const useMock = (fn, params) => async function (...args) {
-    const [event] = args;
+    const [event] = args
 
-    const getTwilioClient = () => Twilio;
+    const getTwilioClient = () => Twilio
 
-    const providers = _.isUndefined(params?.providers)
-      || !_.isPlainObject(params?.providers)
-      ? {} : params.providers;
+    const providers = _.isUndefined(params?.providers) ||
+      !_.isPlainObject(params?.providers)
+      ? {}
+      : params.providers
 
-    const env = _.isUndefined(params?.env)
-      || !_.isPlainObject(params?.env)
-      ? {} : params.env;
+    const env = _.isUndefined(params?.env) ||
+      !_.isPlainObject(params?.env)
+      ? {}
+      : params.env
 
-    const client = _.isUndefined(params?.client)
-    || !_.isObject(params?.client)
-      ? getTwilioClient() : params.client;
+    const client = _.isUndefined(params?.client) ||
+    !_.isObject(params?.client)
+      ? getTwilioClient()
+      : params.client
 
     const providerThat = {
       client,
-      env,
-    };
+      env
+    }
 
     const {
       request, cookies, ...values
-    } = event;
+    } = event
 
-    const providerNames = Object.keys(providers);
+    const providerNames = Object.keys(providers)
 
     const that = {
       request,
@@ -100,58 +107,60 @@ if (process.env.NODE_ENV === 'test') {
         Reflect.defineProperty(
           p, c, {
             value: providers[c].bind(providerThat),
-            enumerable: true,
-          },
-        );
-        return p;
-      }, {}),
-    };
+            enumerable: true
+          }
+        )
+        return p
+      }, {})
+    }
 
     try {
-      return await fn.apply(that, [values]);
+      return await fn.apply(that, [values])
     } catch (err) {
       if (typeof err === 'string') {
-        return new UnauthorizedError(err);
+        return new UnauthorizedError(err)
       }
 
-      return new InternalServerError(err.message);
+      return new InternalServerError(err.message)
     }
-  };
+  }
 
   const useImportsMock = (fn, params) => async function (...args) {
-    const [event] = args;
+    const [event] = args
 
-    const getTwilioClient = () => Twilio;
+    const getTwilioClient = () => Twilio
 
-    const env = _.isUndefined(params?.env)
-    || !_.isPlainObject(params?.env)
-      ? {} : params.env;
+    const env = _.isUndefined(params?.env) ||
+    !_.isPlainObject(params?.env)
+      ? {}
+      : params.env
 
-    const twilio = _.isUndefined(params?.twilio)
-    || !_.isObject(params?.twilio)
-      ? getTwilioClient() : params.twilio;
+    const twilio = _.isUndefined(params?.twilio) ||
+    !_.isObject(params?.twilio)
+      ? getTwilioClient()
+      : params.twilio
 
     const {
       request, cookies, ...values
-    } = event;
+    } = event
 
     const that = {
       request,
       cookies,
       env,
-      twilio,
-    };
+      twilio
+    }
 
     try {
-      return await fn.apply(that, [values]);
+      return await fn.apply(that, [values])
     } catch (err) {
       if (typeof err === 'string') {
-        return new UnauthorizedError(err);
+        return new UnauthorizedError(err)
       }
 
-      return new InternalServerError(err.message);
+      return new InternalServerError(err.message)
     }
-  };
+  }
 
-  module.exports = { useMock, useImportsMock };
+  module.exports = { useMock, useImportsMock }
 }

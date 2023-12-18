@@ -1,20 +1,21 @@
-type NeutralConstructor<T> = {
-  new (): NeutralServerlessInstance<T>;
-};
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+type NeutralConstructor<T> = new () => NeutralServerlessInstance<T>
 
 export class NeutralServerlessInstance<T> {
-  fetch(): Omit<T, 'fetch'> {
-    //@ts-expect-error
+  fetch (): Omit<T, 'fetch'> {
+    // @ts-expect-error
     return this
   }
 }
 
 /**
- * 
- * @param ob 
+ *
+ * @param ob
  * @param Instance
  * @example
- * 
+ *
  * class Human extends NeutralServerlessInstance<Human> {
  *   size: number
  *   name: string
@@ -27,67 +28,65 @@ export class NeutralServerlessInstance<T> {
  * human.age // 31
  * human.name // Iago
  * human.size // 178
- * 
+ *
  * @returns Instance
  */
-export const transformToInstance = <X extends Object, Y extends  NeutralServerlessInstance<Y>>(ob: X, Instance: NeutralConstructor<Y>) => function (ref: Record<keyof X, keyof Y>) {
-  const properties = Object.getOwnPropertyNames(ob) as [keyof X];
-  const factory = new Instance();
+export const transformToInstance = <X extends Record<string, any>, Y extends NeutralServerlessInstance<Y>>(ob: X, Instance: NeutralConstructor<Y>) => function (ref: Record<keyof X, keyof Y>) {
+  const properties = Object.getOwnPropertyNames(ob) as [keyof X]
+  const factory = new Instance()
 
   for (const prop of properties) {
-    const reference = ref[prop]  as keyof Y
+    const reference = ref[prop] as keyof Y
     Reflect.defineProperty(factory, reference, {
       value: ob[prop]
     })
   }
 
-  return factory.fetch();
-};
+  return factory.fetch()
+}
 type PipeFunction = (...args: any[]) => any
 
-
 /**
- * 
- * @param fns 
+ *
+ * @param fns
  * @example
- * 
+ *
  * const getName = (name: string) => {
  *   return name
  * }
- * 
+ *
  * const plusLastName = (lastName: string) => {
  *   return (firstName: string) => {
  *     return `${firstName} ${lastName}`;
  *   }
  * }
- * 
+ *
  * const result = pipe(plusLastName("Braga"), getName )
  * console.log(result('Iago'));
  * @returns T
  */
 export const pipe = (...fns: PipeFunction[]) => fns.reduce((result,
-  fn) => (...args) => fn(result(...args)));
+  fn) => (...args) => fn(result(...args)))
 
-  type CallbackFunction = (...args: any[]) => unknown
-  
-  export const retryAsync = (maxCount = 1) => async function recurrency(
-    args: any, cb: CallbackFunction, count = 1,
-    ): Promise<unknown>
-    {
-      try {
-    return await cb(args);
+  type CallbackFunction = (...args: any[]) => Promise<unknown>
+
+export const retryAsync = (maxCount = 1) => async function recurrency (
+  args: any, cb: CallbackFunction, count = 1
+): Promise<unknown> {
+  try {
+    return await cb(args)
   } catch (err) {
     if (count >= maxCount) {
-      throw err;
+      throw err
     }
-    
-    return recurrency(
-      args, cb, count + 1,
-      );
-    }
-  };
-  
+
+    return await recurrency(
+      args, cb, count + 1
+    )
+  }
+}
+
   type AsyncPipeFunction = (...args: any[]) => Promise<any>
-  
+
 export const pipeAsync = (...fns: AsyncPipeFunction[]) => fns.reduce((result,
-  fn) => async (...args) => fn(await result(...args)));
+  fn) => async (...args) => await fn(await result(...args)))

@@ -1,29 +1,31 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* global describe, it, expect, jest */
 
-const VoiceResponse = require('twilio/lib/twiml/VoiceResponse');
+const VoiceResponse = require('twilio/lib/twiml/VoiceResponse')
 
-const { Twilio } = require('twilio');
-const RequestClient = require('twilio/lib/base/RequestClient');
+const { Twilio } = require('twilio')
+const RequestClient = require('twilio/lib/base/RequestClient')
 
-const mockedRequestClientRequest = jest.spyOn(RequestClient.prototype, 'request');
+const mockedRequestClientRequest = jest.spyOn(RequestClient.prototype, 'request')
 
 class Response {
-  constructor(data) {
-    this.statusCode = data.statusCode;
-    this.body = data.body;
-    this.headers = data.headers ?? {};
+  constructor (data) {
+    this.statusCode = data.statusCode
+    this.body = data.body
+    this.headers = data.headers ?? {}
   }
 
-  setStatusCode(code) {
-    this.statusCode = code;
+  setStatusCode (code) {
+    this.statusCode = code
   }
 
-  setBody(body) {
-    this.body = body;
+  setBody (body) {
+    this.body = body
   }
 
-  appendHeader(key, value) {
-    this.headers[key] = value;
+  appendHeader (key, value) {
+    this.headers[key] = value
   }
 }
 
@@ -32,34 +34,34 @@ if (process.env.NODE_ENV === 'test') {
     global, 'Twilio', {
       enumerable: true,
       get: function () {
-        this.Response = Response;
+        this.Response = Response
 
         this.mockRequestResolvedValue = (data) => {
-          mockedRequestClientRequest.mockResolvedValueOnce(data);
-        };
+          mockedRequestClientRequest.mockResolvedValueOnce(data)
+        }
 
         this.mockRequestImplementation = (fn) => {
-          mockedRequestClientRequest.mockImplementationOnce(fn);
-        };
+          mockedRequestClientRequest.mockImplementationOnce(fn)
+        }
 
         this.mockRequestRejectedValue = (data) => {
-          mockedRequestClientRequest.mockRejectedValueOnce(data);
-        };
+          mockedRequestClientRequest.mockRejectedValueOnce(data)
+        }
 
         this.twiml = {
-          VoiceResponse,
-        };
+          VoiceResponse
+        }
 
-        return this;
+        return this
       }.bind(new Twilio(
-        'AC****', 'pass****', { accountSid: 'AC****' },
-      )),
-    },
-  );
+        'AC****', 'pass****', { accountSid: 'AC****' }
+      ))
+    }
+  )
 }
 
 describe('Global Twilio', () => {
   it('is defined', () => {
-    expect(Twilio).toBeDefined();
-  });
-});
+    expect(Twilio).toBeDefined()
+  })
+})
