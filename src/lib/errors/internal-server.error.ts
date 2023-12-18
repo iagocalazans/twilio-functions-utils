@@ -1,6 +1,6 @@
-const { Response } = require('../responses/default.response');
+import { Response } from '../responses/default.response';
 
-class InternalServerError extends Response {
+export class InternalServerError extends Response {
   constructor(body = 'The server encountered an unexpected condition that prevented it from fulfilling the request!') {
     super(`[ InternalServerError ]: ${body}`, 500);
   }
@@ -8,4 +8,3 @@ class InternalServerError extends Response {
   [Symbol.toStringTag] = this.constructor.name;
 }
 
-module.exports = { InternalServerError };

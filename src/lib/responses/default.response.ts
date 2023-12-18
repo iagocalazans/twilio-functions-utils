@@ -1,28 +1,9 @@
 /* global Twilio */
 
-const _ = require('lodash');
-const { typeOf } = require('try2catch');
+import _  from 'lodash';
+import { typeOf } from 'try2catch';
 
-/**
- * @external "Twilio.Response"
- *
- * @see {@link https://www.twilio.com/docs/libraries/reference/twilio-node/3.81.0/Twilio.html| JSDoc: Class: Twilio}
- */
-
-/**
- * The Response is the must return value on your CustomFn.
- *
- * @class
- *
- * @extends { external:"Twilio.Response" }
- */
-class Response extends Twilio.Response {
-  /**
-   *
-   * @param {(string|object)} body
-   * @param {number} statusCode
-   * @returns {Response}
-   */
+export class Response extends Twilio.Response {
   constructor(body = {}, statusCode = 200) {
     super({ statusCode });
 
@@ -42,11 +23,14 @@ class Response extends Twilio.Response {
     this.appendHeader('Content-Type', 'application/json');
 
     if (typeOf(body) !== 'Array') {
-      this.setBody(_.omit(body, ['_version', '_solution', '_context', _.isFunction]));
+      this.setBody(_.omit(body, [
+        '_version', 
+        '_solution', 
+        '_context', 
+        //@ts-expect-error
+        _.isFunction]));
     } else {
       this.setBody(body);
     }
   }
 }
-
-module.exports = { Response };

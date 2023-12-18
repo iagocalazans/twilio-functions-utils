@@ -1,19 +1,7 @@
 /* global Twilio */
 
-/**
- * The TwiMLResponse is the must return value on your CustomFn when you should return a Twilio TwiML.
- *
- * @class
- *
- * @extends { external:"Twilio.Response" }
- */
-class TwiMLResponse extends Twilio.Response {
-  /**
-   * @param {(string|object)} body You can pass a string or a VoiceResponse object
-   * @param {number} statusCode
-   * @returns {TwiMLResponse}
-   */
-  constructor(body = '<?xml version="1.0" encoding="UTF-8"?><Response />', statusCode = 200) {
+export class TwiMLResponse extends Twilio.Response {
+  constructor(body: string | number | Record<string, any> = '<?xml version="1.0" encoding="UTF-8"?><Response />', statusCode = 200) {
     super({ statusCode, body });
 
     this.appendHeader('Access-Control-Allow-Origin', '*');
@@ -39,4 +27,3 @@ class TwiMLResponse extends Twilio.Response {
   [Symbol.toStringTag] = this.constructor.name;
 }
 
-module.exports = { TwiMLResponse };

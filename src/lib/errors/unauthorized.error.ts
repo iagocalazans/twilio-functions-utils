@@ -1,6 +1,6 @@
-const { Response } = require('../responses/default.response');
+import { Response } from '../responses/default.response';
 
-class UnauthorizedError extends Response {
+export class UnauthorizedError extends Response {
   constructor(body = 'The received request could not be verified!') {
     super(`[ UnauthorizedError ]: ${body}`, 401);
   }
@@ -8,4 +8,3 @@ class UnauthorizedError extends Response {
   [Symbol.toStringTag] = this.constructor.name;
 }
 
-module.exports = { UnauthorizedError };

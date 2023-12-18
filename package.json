@@ -2,14 +2,16 @@
   "name": "twilio-functions-utils",
   "version": "2.4.5",
   "description": "Twilio Functions utils library",
-  "main": "index.js",
+  "main": "es/index.js",
+  "type": "module",
   "types": "./types/twilio-functions-utils",
   "directories": {
-    "lib": "lib"
+    "lib": "es/lib"
   },
   "scripts": {
+    "build": "tsc",
     "test": "jest --coverage && coveralls < coverage/lcov.info",
-    "lint": "eslint --fix index.js lib/",
+    "lint": "eslint --fix src/index.ts src/lib/",
     "docs": "./node_modules/.bin/jsdoc -c jsdoc.json"
   },
   "repository": {
@@ -53,6 +55,7 @@
   },
   "devDependencies": {
     "@twilio-labs/serverless-runtime-types": "^2.2.3",
+    "@types/lodash": "^4.14.202",
     "better-docs": "^2.7.2",
     "coveralls": "^3.1.1",
     "eslint": "^8.14.0",

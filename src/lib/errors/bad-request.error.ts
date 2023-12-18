@@ -1,6 +1,6 @@
-const { Response } = require('../responses/default.response');
+import { Response } from '../responses/default.response';
 
-class BadRequestError extends Response {
+export class BadRequestError extends Response {
   constructor(body = 'The request sent to the server is invalid or corrupted!') {
     super(`[ BadRequestError ]: ${body}`, 400);
   }
@@ -8,4 +8,3 @@ class BadRequestError extends Response {
   [Symbol.toStringTag] = this.constructor.name;
 }
 
-module.exports = { BadRequestError };
