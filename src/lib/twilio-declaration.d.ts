@@ -1,14 +1,14 @@
-
+/* eslint-disable @typescript-eslint/no-extraneous-class */
 declare namespace Twilio {
-    export class Response {
-      constructor(data: Record<string, any>)
-      appendHeader(header: string, data: string): void
-      setBody(body: any): void
-      setStatusCode(code: number): void
-    }
+  export class Response {
+    constructor (data: Record<string, any>)
+    appendHeader (header: string, data: string): void
+    setBody (body: any): void
+    setStatusCode (code: number): void
   }
+}
 
-  declare class Runtime {
-    static getFunctions(): Record<string, {path: string}>
-    static getAssets(): Record<string, {path: string}>
-  }
+declare class Runtime {
+  static getFunctions (): Record<string, { path: string }>
+  static getAssets (): Record<string, { path: string }>
+}
