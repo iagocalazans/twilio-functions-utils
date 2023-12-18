@@ -1,3 +1,10 @@
+
+const { useMock, useImportsMock } = require('./lib/use.mock');
+export {
+  useMock,
+  useImportsMock,
+};
+
 export * from 'try2catch';
 export * from 'declarative-based-flow';
 export * from './lib/errors/bad-request.error';
@@ -9,10 +16,5 @@ export * from './lib/responses/twiml.response';
 export * from './lib/use.injection';
 export * from './lib/transformers';
 export  * from './lib/utils.function';
-const { useMock, useImportsMock } = require('./lib/use.mock');
+export * from './lib/use.imports'
 export * from './lib/dispatch.function';
-
-export {
-  useMock,
-  useImportsMock,
-};

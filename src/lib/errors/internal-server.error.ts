@@ -7,4 +7,3 @@ export class InternalServerError extends Response {
 
   [Symbol.toStringTag] = this.constructor.name;
 }
-

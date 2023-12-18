@@ -16,12 +16,12 @@ export type InjectorThis<Env extends EnvironmentVars, Providers> = {
   providers: Providers;
 }
 
-export type InjectorFunction<Event, Env extends EnvironmentVars, Providers extends ProvidersList> = (this:InjectorThis<Env, Providers>, event: Event) => Promise<any>
+export type InjectorFunction<Event, Env extends EnvironmentVars = Record<string, any>, Providers extends ProvidersList = any> = (this:InjectorThis<Env, Providers>, event: Event) => Promise<any>
 
-export type ProviderFunction<Data = Record<string, any> | any, Env extends EnvironmentVars = any> = (this: {
+export type ProviderFunction<Data extends unknown[] = any, Env extends EnvironmentVars = any> = (this: {
   client: Twilio;
   env: Omit<InjectionContext<Env>, "getTwilioClient">;
-}, event: Data) => any | Promise<any>
+}, ...event: Data) => any | Promise<any>
 
 type Event<Data, Req = {}, Cookies = {}> = {
   [prop in keyof Data]: Data[prop];
@@ -46,7 +46,39 @@ type EnvironmentVars<T = any> = {
 type InjectionContext<T extends Record<string, any>> = 
 EnvironmentVars<T> & { getTwilioClient: () => Twilio }
 
-export const useInjection = <Data, Env extends EnvironmentVars, Providers extends ProvidersList>(fn: InjectorFunction<Event<Data>, Env, Providers>, params: InjectorOptions<any, Env>) => async function (...args: [InjectionContext<Env>, Event<Data>, ServerlessCallback]) {
+
+/**
+ * The useInjection method takes two parameters. The first to apply as a 
+ * handler and the last is an object of configuration options.
+ * 
+ * @param fn Must be writen in standard format, this will be your handler function.
+ * @param params [useInjection] Options.providers Object
+An object that can contain providers that will be defined, which act as use cases to perform internal actions in the handler function through the this.providers method.
+
+[useInjection] Options.validateToken Boolean
+You can pass validateToken equal true to force Flex Token validation using Twilio Flex Token Validator
+ * @returns void
+ * @example
+ * 
+ * async function createAction(event) {
+ *   const { cookies, request, env } = this
+ *   const createTry = await this.providers.create(event)
+ *
+ *   if (createTry.isError) {
+ *     return new BadRequestError(createTry.error);
+ *   }
+ *
+ *   return new Response(createTry.data, 201);
+ * }
+ *
+ * exports.handler = useInjection(createAction, {
+ *    providers: {
+ *      create,
+ *    },
+ *    validateToken: true, // When using Token Validator, the Request body must contain a valid Token from Twilio.
+ * });
+ */
+export const useInjection = <Data = Record<string, any>, Env extends EnvironmentVars = Record<string, any>, Providers extends ProvidersList = any>(fn: InjectorFunction<Event<Data>, Env, Providers>, params: InjectorOptions<any, Env>) => async function (...args: [InjectionContext<Env>, Event<Data>, ServerlessCallback]) {
   const [context, event, callback] = args;
   const { getTwilioClient, ...env } = context;
 

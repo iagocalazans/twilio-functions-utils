@@ -5,7 +5,9 @@
 
 ## ABOUT
 
-![npm](https://img.shields.io/npm/v/twilio-functions-utils?color=white&label=version&logo=npm&style=for-the-badge) ![npm](https://img.shields.io/npm/dw/twilio-functions-utils?color=white&logo=npm&style=for-the-badge) ![npms.io (final)](https://img.shields.io/npms-io/final-score/twilio-functions-utils?color=white&label=score&logo=npm&logoColor=white&style=for-the-badge) ![Coveralls](https://img.shields.io/coveralls/github/iagocalazans/twilio-functions-utils?color=white&logo=coveralls&style=for-the-badge)
+![npm](https://img.shields.io/npm/v/twilio-functions-utils?color=white&label=version&logo=npm&style=for-the-badge) ![npm](https://img.shields.io/npm/dw/twilio-functions-utils?color=white&logo=npm&style=for-the-badge) ![Coveralls](https://img.shields.io/coveralls/github/iagocalazans/twilio-functions-utils?color=white&logo=coveralls&style=for-the-badge)
+
+>> THERE ARE TONS OF THINGS TO ADD TO README, THE PACKAGE NOW HAVE A useImports method and many others... But those README updates will only came in next versions.
 
 This lib was created with the aim of simplifying the use of serverless Twilio, reducing the need to apply frequent try-catches and improving context management, making it no longer necessary to return the callback() method in all functions.
 
@@ -15,7 +17,13 @@ This lib was created with the aim of simplifying the use of serverless Twilio, r
 npm install twilio-functions-utils
 ```
 
+```cmd
+yarn add twilio-functions-utils
+```
+
 ## HOW IT WORKS
+
+>> THERE ARE TONS OF THINGS TO ADD TO README, THE PACKAGE NOW HAVE A useImports method and many others... But those README updates will only came in next versions.
 
 The lib provides a function `useInjection` who returns a brand function for every execution. This returned function is ready to receive the Twilio Handler arguments and make them available as `this`  properties as `this.request`, `this.cookies` and `this.env` at the Function level and `this.client` and `this.env` at the Provider function level.
 
