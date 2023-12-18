@@ -10,6 +10,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "prebuild": "rm -Rf ./es",
     "test": "jest --coverage && coveralls < coverage/lcov.info",
     "lint": "eslint --fix src/index.ts src/lib/",
     "docs": "./node_modules/.bin/jsdoc -c jsdoc.json"

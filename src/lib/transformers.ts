@@ -72,7 +72,8 @@ export const pipe = (...fns: PipeFunction[]) => fns.reduce((result,
   
   export const retryAsync = (maxCount = 1) => async function recurrency(
     args: any, cb: CallbackFunction, count = 1,
-    ) {
+    ): Promise<unknown>
+    {
       try {
     return await cb(args);
   } catch (err) {
