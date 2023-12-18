@@ -7,19 +7,21 @@ import  _ from 'lodash';
 import { InternalServerError }  from './errors/internal-server.error';
 import { UnauthorizedError } from './errors/unauthorized.error';
 import { Twilio } from 'twilio';
-import { ServerlessCallback, TwilioClient } from '@twilio-labs/serverless-runtime-types/types';
+import { ServerlessCallback } from '@twilio-labs/serverless-runtime-types/types';
 
-export type InjectorFunction<Event, Env extends EnvironmentVars, Providers extends ProvidersList> = (this: {
+export type InjectorThis<Env extends EnvironmentVars, Providers> = {
   request: Record<string, any>;
   cookies: Record<string, any>;
   env: Omit<InjectionContext<Env>, "getTwilioClient">;
   providers: Providers;
-}, event: Event) => Promise<any>
+}
+
+export type InjectorFunction<Event, Env extends EnvironmentVars, Providers extends ProvidersList> = (this:InjectorThis<Env, Providers>, event: Event) => Promise<any>
 
 export type ProviderFunction<Data = Record<string, any> | any, Env extends EnvironmentVars = any> = (this: {
   client: Twilio;
   env: Omit<InjectionContext<Env>, "getTwilioClient">;
-}, event: Data) => Promise<any>
+}, event: Data) => any | Promise<any>
 
 type Event<Data, Req = {}, Cookies = {}> = {
   [prop in keyof Data]: Data[prop];
@@ -105,61 +107,3 @@ export const useInjection = <Data, Env extends EnvironmentVars, Providers extend
     return callback(null, new InternalServerError(err.message));
   }
 };
-
-// export const useImports = (fn, opts) => async function (...args) {
-//   const [context, event, callback] = args;
-//   const { getTwilioClient, ...env } = context;
-
-//   const validateToken = _.isUndefined(opts?.validateToken)
-//     || _.isNull(opts?.validateToken)
-//     ? false : opts.validateToken;
-
-//   const {
-//     request, cookies, Token, ...values
-//   } = event;
-
-//   const that = {
-//     request,
-//     cookies,
-//     env,
-//     twilio: getTwilioClient(),
-//   };
-
-//   try {
-//     if (validateToken) {
-//       const validation = await tokenValidator(
-//         Token, env.ACCOUNT_SID, env.AUTH_TOKEN,
-//       );
-
-//       if (!validation.valid) {
-//         return callback(undefined, new UnauthorizedError(validation.message));
-//       }
-//     }
-
-//     return callback(undefined, await fn.apply(that, [values]));
-//   } catch (err) {
-//     if (typeof err === 'string') {
-//       return callback(undefined, new UnauthorizedError(err));
-//     }
-
-//     return callback(undefined, new InternalServerError(err.message));
-//   }
-// };
-
-// export const getFromRuntime = (objectThis) => (
-//   type, name, path,
-// ) => async function (...args) {
-//   const file = require(type === 'function'
-//     ? Runtime.getFunctions()[path].path
-//     : Runtime.getAssets()[`/${path}.js`].path);
-
-//   return file[name].bind({
-//     twilio: objectThis.twilio,
-//     env: objectThis.env,
-//   })(...args);
-// };
-
-// export const TWILIO_TYPES = {
-//   Functions: 'function',
-//   Assets: 'asset',
-// };

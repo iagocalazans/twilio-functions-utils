@@ -7,3 +7,8 @@ declare namespace Twilio {
       setStatusCode(code: number): void
     }
   }
+
+  declare class Runtime {
+    static getFunctions(): Record<string, {path: string}>
+    static getAssets(): Record<string, {path: string}>
+  }

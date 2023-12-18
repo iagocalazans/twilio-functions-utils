@@ -102,6 +102,8 @@
     "node_modules",
     "coverage",
     "**/*.test.js",
-    "**/*.config.js"
+    "**/*.config.js",
+    "src/assets",
+    "src/functions",
   ]
 }
