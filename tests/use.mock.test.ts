@@ -1,11 +1,12 @@
+import { InjectorFunction, InjectorThis } from '../src/lib/use.injection';
 /* global jest, describe, it, expect, Runtime, Twilio */
 
-require('../lib/twilio.mock');
+require('../src/lib/twilio.mock');
 const fs = require('fs');
 
 const fsCalls = jest.spyOn(fs, 'existsSync');
 
-const {
+import {
   useMock,
   BadRequestError,
   InternalServerError,
@@ -13,21 +14,48 @@ const {
   TwiMLResponse,
   NotFoundError,
   UnauthorizedError,
-} = require('../index');
+} from '../src/index';
 
 const responseTypes = {
-  twiml: (provided) => new TwiMLResponse(provided.twiml),
+  twiml: (provided: { twiml: any }) => new TwiMLResponse(provided.twiml),
   badRequest: () => new BadRequestError(),
   internalServer: () => new InternalServerError(),
   notFound: () => new NotFoundError(),
-  response: (provided) => new Response({ ...provided }),
-  responseAsString: (provided) => new Response(provided.message),
+  response: (provided: { twiml: any }) => new Response({ ...provided }),
+  responseAsString: (provided: { message: string }) => new Response(provided.message),
 };
 
 const { functionUsedToTest } = require(Runtime.getFunctions()['use-to-test'].path);
 const { assetUsedToTest } = require(Runtime.getAssets()['/use-to-test.js'].path);
 
-async function useItToMock(event) {
+type ResponseTypes = {
+  twiml: (provided: {
+      twiml: any;
+  }) => TwiMLResponse;
+  badRequest: () => BadRequestError;
+  internalServer: () => InternalServerError;
+  notFound: () => NotFoundError;
+  response: (provided: {
+      twiml: any;
+  }) => Response;
+  responseAsString: (provided: {
+      message: string;
+  }) => Response;
+}
+
+type useItToMockThis = InjectorThis<{}, {
+    useItAsProvider(event: any): { type: keyof ResponseTypes}, 
+    functionUsedToTest(event: any): {
+      twiml: any;
+      message: string
+  }, 
+    assetUsedToTest(data: any): {
+      twiml: any;
+      message: string
+  }
+  }>
+
+async function useItToMock(this: useItToMockThis, event: {forceFail: boolean, forceUnauthorized: boolean}) {
   const provided = this.providers.useItAsProvider(event);
 
   if (event.forceFail) {
@@ -44,9 +72,9 @@ async function useItToMock(event) {
       .assetUsedToTest(event));
 
   return responseTypes[provided.type](reprovided);
-}
+} 
 
-function useItAsProvider(event) {
+function useItAsProvider(event: string) {
   Object.defineProperty(
     event, 'evaluated', {
       value: true,
@@ -134,15 +162,15 @@ describe('Function useMock', () => {
     expect(fsCalls).toHaveBeenCalled();
 
     expect(Runtime.getFunctions()['use-to-test'].path).toBe(`${process.cwd()
-    }/functions/use-to-test`);
+    }/src/functions/use-to-test`);
     expect(Runtime.getAssets()['/use-to-test.js'].path).toBe(`${process.cwd()
-    }/assets/use-to-test`);
+    }/src/assets/use-to-test`);
   });
 
   it('Should throw an error while creating a syncMapItems without key', async () => {
     try {
-      await Runtime.getSync().maps('SN****').syncMapItems.create({ data: { notToTeste: 'something' } });
-    } catch (err) {
+      await Runtime.getSync().maps('SN****').syncMapItems.create({ data: {} });
+    } catch (err: any) {
       expect(err).toBeInstanceOf(Error);
       expect(err.message).toMatch("Required parameter \"opts['key']\" missing.");
     }

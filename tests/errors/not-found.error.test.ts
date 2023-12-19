@@ -1,7 +1,5 @@
-/* global describe, it, expect */
-
 require('../../lib/twilio.mock');
-const { NotFoundError } = require('../../index');
+import { NotFoundError } from '../../src/index';
 
 describe('NotFoundError Class', () => {
   it('Should be an Instance of Response', () => {

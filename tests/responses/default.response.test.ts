@@ -1,7 +1,5 @@
-/* global describe, it, expect */
-
-require('../../lib/twilio.mock');
-const { Response } = require('../../index');
+require('../../src/lib/twilio.mock');
+import { Response } from '../../src/index';
 
 describe('Twilio Response', () => {
   it('Should be an Instance of Response', () => {
