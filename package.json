@@ -3,14 +3,13 @@
   "version": "4.0.0",
   "description": "Twilio Functions utils library",
   "main": "./es/index.js",
-  "type": "module",
   "directories": {
     "lib": "./es/lib"
   },
   "scripts": {
     "build": "tsc",
     "prebuild": "rm -Rf ./es",
-    "test": "jest --coverage && coveralls < coverage/lcov.info",
+    "test": "jest",
     "lint": "eslint --fix src/index.ts src/lib/",
     "docs": "./node_modules/.bin/jsdoc -c jsdoc.json"
   },
@@ -55,6 +54,7 @@
   },
   "devDependencies": {
     "@twilio-labs/serverless-runtime-types": "^2.2.3",
+    "@types/jest": "^29.5.11",
     "@types/lodash": "^4.14.202",
     "better-docs": "^2.7.2",
     "coveralls": "^3.1.1",
@@ -63,6 +63,7 @@
     "eslint-plugin-import": "^2.26.0",
     "jest": "^28.0.3",
     "jsdoc": "^3.6.11",
+    "ts-jest": "^29.1.1",
     "twilio-run": "^3.4.2"
   },
   "engines": {

@@ -1,5 +1,3 @@
-/* global describe, it, expect, jest */
-
 require('../lib/twilio.mock');
 
 const tokenValidator = require('twilio-flex-token-validator');
@@ -10,26 +8,48 @@ const token = jest.spyOn(tokenValidator, 'validator');
 
 token.mockResolvedValue({ valid: false });
 
-const {
+import {
   useInjection,
   BadRequestError,
   InternalServerError,
   Response,
   TwiMLResponse,
   NotFoundError,
-} = require('../index');
+  InjectorThis,
+} from '../src/index';
 const { UnauthorizedError } = require('../lib/errors/unauthorized.error');
 
+
+type ResponseTypes = {
+  twiml: (provided: {
+      twiml: any;
+  }) => TwiMLResponse;
+  badRequest: () => BadRequestError;
+  internalServer: () => InternalServerError;
+  notFound: () => NotFoundError;
+  response: (provided: {
+      twiml: any;
+  }) => Response;
+  responseAsString: (provided: {
+      message: string;
+  }) => Response;
+}
+
 const responseTypes = {
-  twiml: (provided) => new TwiMLResponse(provided.twiml),
+  twiml: (provided: { twiml: any, message: string, type: keyof ResponseTypes }) => new TwiMLResponse(provided.twiml),
   badRequest: () => new BadRequestError(),
   internalServer: () => new InternalServerError(),
   notFound: () => new NotFoundError(),
-  response: (provided) => new Response(provided),
-  responseAsString: (provided) => new Response(provided.message),
+  response: (provided: { twiml: any, message: string, type: keyof ResponseTypes }) => new Response({ ...provided }),
+  responseAsString: (provided: { twiml: any, message: string, type: keyof ResponseTypes }) => new Response(provided.message),
 };
 
-function useItToMock(event) {
+
+type useItToMockThis = InjectorThis<{}, {
+  useItAsProvider(event: any): { twiml: any, message: string, type: keyof ResponseTypes }, 
+}>
+
+async function useItToMock(this: useItToMockThis, event: {forceFail: boolean, forceUnauthorized: boolean}) {  
   const provided = this.providers.useItAsProvider(event);
 
   if (event.forceFail) {
@@ -39,7 +59,7 @@ function useItToMock(event) {
   return responseTypes[provided.type](provided);
 }
 
-function useItAsProvider(event) {
+function useItAsProvider(event: string) {
   Object.defineProperty(
     event, 'evaluated', {
       value: true,
