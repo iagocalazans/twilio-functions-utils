@@ -1,4 +1,4 @@
-require('../../lib/twilio.mock');
+require('../../src/lib/twilio.mock');
 import { NotFoundError } from '../../src/index';
 
 describe('NotFoundError Class', () => {

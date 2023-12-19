@@ -1,8 +1,7 @@
-import { InjectorFunction, InjectorThis } from '../src/lib/use.injection';
-/* global jest, describe, it, expect, Runtime, Twilio */
-
 require('../src/lib/twilio.mock');
-const fs = require('fs');
+
+import { InjectorThis } from '../src/lib/use.injection';
+import fs from 'fs';
 
 const fsCalls = jest.spyOn(fs, 'existsSync');
 

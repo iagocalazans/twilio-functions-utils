@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-extraneous-class */
 declare namespace Twilio {
     export class Response {
+      body: any
+      statusCode: number
+      headers: Record<string, any>
       constructor(data: Record<string, any>)
       appendHeader(header: string, data: string): void
       setBody(body: any): void
