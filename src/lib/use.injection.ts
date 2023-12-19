@@ -25,9 +25,9 @@ export type ProviderFunction<Data extends unknown[] = any, Env extends Environme
 
 type Event<Data, Req = {}, Cookies = {}> = {
   [prop in keyof Data]: Data[prop];
-} & { Token: string;
-  request: Req;
-  cookies: Cookies; }
+} & { Token?: string;
+  request?: Req;
+  cookies?: Cookies; }
 
 type ProvidersList = {
   [key: string]: ProviderFunction
@@ -38,12 +38,12 @@ type InjectorOptions<Data extends Record< string, any>, Env extends EnvironmentV
   validateToken?: boolean
 }
 
-type EnvironmentVars<T = any> = {
+export type EnvironmentVars<T = any> = {
   [prop in keyof T]: T[prop]
   & { ACCOUNT_SID: string, AUTH_TOKEN: string }
 }
 
-type InjectionContext<T extends Record<string, any>> = 
+export type InjectionContext<T extends Record<string, any>> = 
 EnvironmentVars<T> & { getTwilioClient: () => Twilio }
 
 
@@ -78,7 +78,7 @@ You can pass validateToken equal true to force Flex Token validation using Twili
  *    validateToken: true, // When using Token Validator, the Request body must contain a valid Token from Twilio.
  * });
  */
-export const useInjection = <Data = Record<string, any>, Env extends EnvironmentVars = Record<string, any>, Providers extends ProvidersList = any>(fn: InjectorFunction<Event<Data>, Env, Providers>, params: InjectorOptions<any, Env>) => async function (...args: [InjectionContext<Env>, Event<Data>, ServerlessCallback]) {
+export const useInjection = <Data = Record<string, any>, Env extends EnvironmentVars = Record<string, any>, Providers extends ProvidersList = any>(fn: InjectorFunction<Event<Data>, Env, Providers>, params: InjectorOptions<any, Env>) => async function (...args: [InjectionContext<Env>, Event<Data>, ServerlessCallback]): Promise<ReturnType<InjectorFunction<Event<Data>, Env, Providers>>> {
   const [context, event, callback] = args;
   const { getTwilioClient, ...env } = context;
 
@@ -119,16 +119,20 @@ export const useInjection = <Data = Record<string, any>, Env extends Environment
   };
 
   try {
-    if (validateToken && Token) {
+    if (validateToken) {
+      if (!Token) {
+        throw String("Unauthorized: Token was not provided")
+      }
+  
       const validation: any = await validator(
         Token, env.ACCOUNT_SID, env.AUTH_TOKEN,
       );
-
+  
       if (!validation.valid) {
         return callback(null, new UnauthorizedError(validation.message));
       }
     }
-
+    
     //@ts-ignore
     return callback(null, await fn.apply(that, [values]));
   } catch (err: any) {

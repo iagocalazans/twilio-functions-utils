@@ -1,6 +1,7 @@
-require('../lib/twilio.mock');
+require('../src/lib/twilio.mock');
 
-const tokenValidator = require('twilio-flex-token-validator');
+import * as tokenValidator from 'twilio-flex-token-validator';
+
 
 jest.mock('twilio-flex-token-validator');
 
@@ -16,8 +17,10 @@ import {
   TwiMLResponse,
   NotFoundError,
   InjectorThis,
+  InjectionContext,
+  EnvironmentVars,
+  UnauthorizedError
 } from '../src/index';
-const { UnauthorizedError } = require('../lib/errors/unauthorized.error');
 
 
 type ResponseTypes = {
@@ -49,7 +52,7 @@ type useItToMockThis = InjectorThis<{}, {
   useItAsProvider(event: any): { twiml: any, message: string, type: keyof ResponseTypes }, 
 }>
 
-async function useItToMock(this: useItToMockThis, event: {forceFail: boolean, forceUnauthorized: boolean}) {  
+async function useItToMock(this: useItToMockThis, event: {twiml?: any, message?: string, type?: keyof ResponseTypes, forceUnauthorized?: boolean, forceFail?: boolean}) {  
   const provided = this.providers.useItAsProvider(event);
 
   if (event.forceFail) {
@@ -72,8 +75,7 @@ function useItAsProvider(event: string) {
 
 const fn = useInjection(useItToMock, {
   providers: {
-    useItAsProvider,
-
+    useItAsProvider
   },
 });
 
@@ -84,14 +86,12 @@ const fnWithToken = useInjection(useItToMock, {
   validateToken: true,
 });
 
-const twilioContext = {
+const twilioContext: InjectionContext<EnvironmentVars> = {
+//@ts-ignore
   getTwilioClient() {
+  },DOMAIN_NAME: "string", ACCOUNT_SID: "string", AUTH_TOKEN: "string",};
 
-  },
-  DOMAIN_NAME: 'https://localhost:3000',
-  ACCOUNT_SID: '',
-};
-const twilioCallback = function (err, response) {
+const twilioCallback = function (err: any, response: any) {
   if (err) {
     return err;
   }
@@ -99,15 +99,20 @@ const twilioCallback = function (err, response) {
   return response;
 };
 
-function VoiceResponse() {
+function VoiceResponse(this: {body: string}) {
   this.body = 'Response';
 
   this.toString = () => this.body;
+
+  return this
 }
-function VoiceXmlTag() {
+
+function VoiceXmlTag(this: {body: string}) {
   this.body = '<?xml version="1.0" encoding="UTF-8"?><Response />';
 
   this.toString = () => this.body;
+
+  return this
 }
 
 describe('Function useInjection', () => {
@@ -137,7 +142,7 @@ describe('Function useInjection', () => {
   });
   it('Should respond with a TwiMLResponse Instance even if receives a valid TwimlResponse Object without the xml tag', async () => {
     const callback = await fn(
-      twilioContext, { type: 'twiml', twiml: new VoiceResponse() }, twilioCallback,
+      twilioContext, { type: 'twiml', twiml: new (VoiceResponse as any)() }, twilioCallback,
     );
 
     expect(callback).toBeInstanceOf(TwiMLResponse);
@@ -145,7 +150,7 @@ describe('Function useInjection', () => {
   });
   it('Should respond with a TwiMLResponse Instance even if receives a valid TwimlResponse Object', async () => {
     const callback = await fn(
-      twilioContext, { type: 'twiml', twiml: new VoiceXmlTag() }, twilioCallback,
+      twilioContext, { type: 'twiml', twiml: new (VoiceXmlTag as any)() }, twilioCallback,
     );
 
     expect(callback).toBeInstanceOf(TwiMLResponse);
@@ -200,7 +205,7 @@ describe('Function useInjection', () => {
     expect(callback.body).toEqual('[ UnauthorizedError ]: The received request could not be verified!');
   });
   it('Should respond with a UnauthorizedError Instance', async () => {
-    token.mockRejectedValue('Unauthorized: Token was not provided');
+    // token.mockRejectedValue({valid: false, message: 'Unauthorized: Token was not provided'});
     const callback = await fnWithToken(
       twilioContext, { type: 'response' }, twilioCallback,
     );

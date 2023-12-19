@@ -14,7 +14,7 @@ export class Response extends Twilio.Response {
       this.appendHeader('Content-Type', 'text/plain');
       this.setBody(body);
 
-      return;
+      return this;
     }
 
     this.appendHeader('Access-Control-Allow-Origin', '*');
@@ -32,5 +32,7 @@ export class Response extends Twilio.Response {
     } else {
       this.setBody(body);
     }
+
+    return this
   }
 }
