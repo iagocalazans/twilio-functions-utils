@@ -1,10 +1,5 @@
-/** @type {import('jest/types')} */
+/** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
+  preset: 'ts-jest',
   testEnvironment: 'node',
-  verbose: true,
-  testMatch: ['**/tests/**/*.[j]s?(x)', '**/?(*.)+(spec|test).[j]s?(x)'],
-  modulePathIgnorePatterns: [
-    '<rootDir>/assets',
-    '<rootDir>/functions',
-  ],
 };
