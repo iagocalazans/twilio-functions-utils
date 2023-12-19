@@ -101,7 +101,7 @@
   "exclude": [
     "node_modules",
     "coverage",
-    "**/*.test.js",
+    "**/*.test.ts",
     "**/*.config.js",
     "src/assets",
     "src/functions",

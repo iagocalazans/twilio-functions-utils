@@ -26,14 +26,14 @@ export type ImportFunction<Event, Env extends EnvironmentVars> = (this: {
 
   type Event<Data, Req = Record<string, unknown>, Cookies = Record<string, unknown>> = {
     [prop in keyof Data]: Data[prop];
-  } & { Token: string
-    request: Req
-    cookies: Cookies
-  }
-
-interface ImportOptions {
-  validateToken?: boolean
+  } & { Token?: string;
+    request?: Req;
+    cookies?: Cookies; 
 }
+  
+  type ImportOptions = {
+    validateToken?: boolean
+  }
 
   type EnvironmentVars<T = any> = {
     [prop in keyof T]: T[prop]
@@ -65,6 +65,10 @@ export const useImports = <Data, Env extends EnvironmentVars>(fn: ImportFunction
 
   try {
     if (validateToken) {
+      if (!Token) {
+        throw String("Unauthorized: Token was not provided")
+      }
+  
       const validation: any = await validator(
         Token, env.ACCOUNT_SID, env.AUTH_TOKEN
       )
