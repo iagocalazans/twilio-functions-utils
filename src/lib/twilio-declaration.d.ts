@@ -13,7 +13,6 @@ declare namespace Twilio {
     export function mockRequestResolvedValue(value: any) : any
     export function mockRequestRejectedValue(value: any) : any
   }
-}
 
   declare class Runtime {
     static getFunctions(): Record<string, {path: string}>

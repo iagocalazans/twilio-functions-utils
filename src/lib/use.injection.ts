@@ -130,17 +130,15 @@ export const useInjection = <Data = Record<string, any>, Env extends Environment
       )
 
       if (!validation.valid) {
-        callback(null, new UnauthorizedError(validation.message)); return
-      }
+       return callback(null, new UnauthorizedError(validation.message));      }
     }
     
     //@ts-ignore
     return callback(null, await fn.apply(that, [values]));
   } catch (err: any) {
     if (typeof err === 'string') {
-      callback(null, new UnauthorizedError(err)); return
-    }
+     return callback(null, new UnauthorizedError(err));    }
 
-    callback(null, new InternalServerError(err.message))
+    return callback(null, new InternalServerError(err.message))
   }
 }
