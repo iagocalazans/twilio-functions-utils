@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-extraneous-class */
 declare namespace Twilio {
     export class Response {
       body: any
