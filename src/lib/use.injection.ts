@@ -27,9 +27,9 @@ export type ProviderFunction<Data extends unknown[] = any, Env extends Environme
 
 type Event<Data, Req = Record<string, any>, Cookies = Record<string, any>> = {
   [prop in keyof Data]: Data[prop];
-} & { Token?: string;
-  request?: Req;
-  cookies?: Cookies; }
+} & { Token?: string
+  request?: Req
+  cookies?: Cookies }
 
 type ProvidersList = Record<string, ProviderFunction>
 
@@ -43,7 +43,7 @@ export type EnvironmentVars<T = any> = {
   & { ACCOUNT_SID: string, AUTH_TOKEN: string }
 }
 
-export type InjectionContext<T extends Record<string, any>> = 
+export type InjectionContext<T extends Record<string, any>> =
 EnvironmentVars<T> & { getTwilioClient: () => Twilio }
 
 /**
@@ -78,8 +78,8 @@ You can pass validateToken equal true to force Flex Token validation using Twili
  * });
  */
 export const useInjection = <Data = Record<string, any>, Env extends EnvironmentVars = Record<string, any>, Providers extends ProvidersList = any>(fn: InjectorFunction<Event<Data>, Env, Providers>, params: InjectorOptions) => async function (...args: [InjectionContext<Env>, Event<Data>, ServerlessCallback]): Promise<ReturnType<InjectorFunction<Event<Data>, Env, Providers>>> {
-  const [context, event, callback] = args;
-  const { getTwilioClient, ...env } = context;
+  const [context, event, callback] = args
+  const { getTwilioClient, ...env } = context
 
   const providers = _.isUndefined(params?.providers) ||
     !_.isPlainObject(params?.providers)
@@ -122,22 +122,23 @@ export const useInjection = <Data = Record<string, any>, Env extends Environment
   try {
     if (validateToken) {
       if (!Token) {
-        throw String("Unauthorized: Token was not provided")
+        // eslint-disable-next-line @typescript-eslint/no-throw-literal
+        throw String('Unauthorized: Token was not provided')
       }
-  
+
       const validation: any = await validator(
         Token, env.ACCOUNT_SID, env.AUTH_TOKEN
       )
 
       if (!validation.valid) {
-       return callback(null, new UnauthorizedError(validation.message));      }
+        return callback(null, new UnauthorizedError(validation.message));      }
     }
-    
-    //@ts-ignore
-    return callback(null, await fn.apply(that, [values]));
+
+    // @ts-expect-error
+    return callback(null, await fn.apply(that, [values]))
   } catch (err: any) {
     if (typeof err === 'string') {
-     return callback(null, new UnauthorizedError(err));    }
+      return callback(null, new UnauthorizedError(err));    }
 
     return callback(null, new InternalServerError(err.message))
   }

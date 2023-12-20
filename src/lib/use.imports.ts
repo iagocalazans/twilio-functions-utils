@@ -26,14 +26,14 @@ export type ImportFunction<Event, Env extends EnvironmentVars> = (this: {
 
   type Event<Data, Req = Record<string, unknown>, Cookies = Record<string, unknown>> = {
     [prop in keyof Data]: Data[prop];
-  } & { Token?: string;
-    request?: Req;
-    cookies?: Cookies; 
-}
-  
-  type ImportOptions = {
-    validateToken?: boolean
+  } & { Token?: string
+    request?: Req
+    cookies?: Cookies
   }
+
+interface ImportOptions {
+  validateToken?: boolean
+}
 
   type EnvironmentVars<T = any> = {
     [prop in keyof T]: T[prop]
@@ -66,26 +66,25 @@ export const useImports = <Data, Env extends EnvironmentVars>(fn: ImportFunction
   try {
     if (validateToken) {
       if (!Token) {
-        throw String("Unauthorized: Token was not provided")
+        // eslint-disable-next-line @typescript-eslint/no-throw-literal
+        throw String('Unauthorized: Token was not provided')
       }
-  
+
       const validation: any = await validator(
         Token, env.ACCOUNT_SID, env.AUTH_TOKEN
       )
 
       if (!validation.valid) {
-        callback(null, new UnauthorizedError(validation.message)); return
-      }
+        return callback(null, new UnauthorizedError(validation.message));      }
     }
 
     // @ts-expect-error
-    callback(null, await fn.apply(that, [values]))
+    return callback(null, await fn.apply(that, [values]))
   } catch (err: any) {
     if (typeof err === 'string') {
-      callback(null, new UnauthorizedError(err)); return
-    }
+      return callback(null, new UnauthorizedError(err));    }
 
-    callback(null, new InternalServerError(err.message))
+    return callback(null, new InternalServerError(err.message))
   }
 }
 
