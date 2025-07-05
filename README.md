@@ -1,388 +1,411 @@
-
-# Twilio Functions Utils
+# Twilio Functions Utils ⚡
 
 <img src="https://avatars.githubusercontent.com/u/109142?s=200&v=4" width="80" />
 
-## ABOUT
-
 ![npm](https://img.shields.io/npm/v/twilio-functions-utils?color=white&label=version&logo=npm&style=for-the-badge) ![npm](https://img.shields.io/npm/dw/twilio-functions-utils?color=white&logo=npm&style=for-the-badge) ![npms.io (final)](https://img.shields.io/npms-io/final-score/twilio-functions-utils?color=white&label=score&logo=npm&logoColor=white&style=for-the-badge) ![Coveralls](https://img.shields.io/coveralls/github/iagocalazans/twilio-functions-utils?color=white&logo=coveralls&style=for-the-badge)
 
-This lib was created with the aim of simplifying the use of serverless Twilio, reducing the need to apply frequent try-catches and improving context management, making it no longer necessary to return the callback() method in all functions.
+## 🚀 **Next-Generation Twilio Functions Development**
 
-### Install
+A powerful, **RxJS-powered** utility library that revolutionizes Twilio serverless function development with reactive streams, functional composition, and zero-boilerplate dependency injection.
 
-```cmd
+**✨ What's New in v2.4+:**
+- 🔄 **Reactive Streams**: Built on RxJS for composable, testable functions
+- 🎯 **Zero Breaking Changes**: 100% backward compatible with existing code
+- 🧪 **Enhanced Testing**: Marble testing and advanced mocking capabilities
+- 🛠 **Two API Levels**: Simple injection API + powerful Effects API
+- ⚡ **Better Performance**: Optimized stream processing
+- 🔒 **Type Safe**: Full TypeScript support with proper inference
+
+```bash
 npm install twilio-functions-utils
 ```
 
-## HOW IT WORKS
+---
 
-The lib provides a function `useInjection` who returns a brand function for every execution. This returned function is ready to receive the Twilio Handler arguments and make them available as `this`  properties as `this.request`, `this.cookies` and `this.env` at the Function level and `this.client` and `this.env` at the Provider function level.
+## 🎯 **Quick Start**
 
-### # useInjection(Function, Options) <sup><sub>Function</sub></sup>
+### **Option 1: Simple API (Familiar & Easy)**
 
-The useInjection method takes two parameters. The first to apply as a handler and the last is an object of configuration options.
+```javascript
+const { useInjection, Response, BadRequestError, Result } = require('twilio-functions-utils');
 
-##### [useInjection] Function <sup><sub>Function</sub></sup>
-
-Must be writen in standard format, this will be your `handler` function.
-
-```js
-  function createSomeThing (event) {
-    ...
-  }
-```
-
-##### [useInjection] Options.providers <sup><sub>Object</sub></sup>
-
-An object that can contain providers that will be defined, which act as use cases to perform internal actions in the handler function through the `this.providers` method.
-
-##### [useInjection] Options.validateToken <sup><sub>Boolean</sub></sup>
-
-You can pass `validateToken` equal true to force Flex Token validation using [Twilio Flex Token Validator](https://github.com/twilio/twilio-flex-token-validator)
-
-```js
-useInjection(yourFunction,
-  {
-    providers: { create, remove },
-    validateToken: true
-  }
-);
-```
-
-When using Token Validator, the Request body must contain a valid Token from Twilio Flex.
-
-```js
-// Event
-{
-  Token: "Twilio-Token-Here"
-}
-```
-
-### Response <sup><sub>Class</sub></sup>
-
-The responses coming from the function destined to the handler must be returned as an instance of Response.
-
-Response receives a string and a number (status code):
-
-```js
-return new Response('Your pretty answer.', 200);
-```
-
-There are two failure response models, BadRequest and NotFound. Its use follows the same model.
-
-```js
-const notFound = new NotFoundError('Your error message here.');
-const badRequest = new BadRequestError('Your error message here.');
-```
-
-### TwiMLResponse <sup><sub>Class</sub></sup>
-
-There is a proper response template to use with the TwiML format:
-
-```js
-const twimlVoice = new Twilio.twiml
-  .VoiceResponse();
-
-const enqueueVoice = twimlVoice
-  .enqueue({
-    action,
-    workflowSid,
-  })
-  .task('{}');
-
-return new TwiMLResponse(twimlVoice, 201)
-```
-
-#### Usage
-
-**IMPORTANT TO USE REGULAR FUNCTIONS** ➜ With arrow functions it doesn't work as expected as `this` cannot be injected correctly.
-
-```js
-  function yourFunctionName() {
-    // ...
-  }
-```
-
-Separate your actions from the main routine of the code. Break it down into several smaller parts that interact with your event, to facilitate future changes. You can create functions such as Assets or Functions, then just import them through the Runtime and pass them to the provider.
-
-```js
-// File: assets/create.private.js
-
-const { Result } = require('twilio-functions-utils');
-
-/**
- * Here you can acess  Twilio Client as client and Context as env (so you can get env vars).
- * 
- * @function
- * @param { object } event
- */
-exports.create = async function (event) {
-  const { client, env } = this
-
-  return Result.ok(await new Promise((resolve, reject) => {
-    const random = Math.random();
-
-    if (random >= 0.5) {
-      return resolve({ sucess: 'Resolved' });
-    }
+// Provider: Your business logic
+const sendSmsProvider = async function (to, message) {
+  const { client } = this;
   
-    return reject(new Error('Unresolved'));
-  }));
+  try {
+    const result = await client.messages.create({
+      to,
+      from: '+1234567890',
+      body: message
+    });
+    return Result.ok({ sid: result.sid, status: 'sent' });
+  } catch (error) {
+    return Result.failed(error.message);
+  }
 };
-```
 
-In your handler you will have access to the function through the providers property, internal to the this of the function that precedes the handler.
-
-```js
-// File: functions/create.js
-
-const { useInjection, Response } = require('twilio-functions-utils');
-const { create } = require(Runtime.getAssets()['/create.js'].path)
-
-/**
- * @typedef { object } CreateActionThis
- * 
- * @property { object } request
- * @property { object } cookies
- * @property { object } env
- * @property { string } env.DOMAIN_NAME
- * @property { object } providers
- * @property { create } providers.create
- */
-
-/**
- * You can perform all your "controller" level actions, as you have access to the request headers and cookies.
- * Then just call the providers you provided to handler by using useInjection.
- * Just put it on a Response object and you are good to go!
- * 
- * @function
- * @param { object } event
- * @this CreateActionThis
- */
-async function createAction(event) {
-  const { cookies, request, env } = this
-  const providerResult = await this.providers.create(event)
-
-  if (providerResult.isError) {
-    return new BadRequestError(providerResult.error);
+// Handler: Your Twilio Function
+async function sendSmsHandler(event) {
+  const { env, providers } = this;
+  const { to, message } = event;
+  
+  if (!to || !message) {
+    return new BadRequestError('Missing "to" or "message" parameters');
   }
-
-  return new Response(providerResult.data, 201);
+  
+  const result = await providers.sendSms(to, message);
+  
+  if (result.isError) {
+    return new BadRequestError(result.error);
+  }
+  
+  return new Response(result.data, 201);
 }
 
-exports.handler = useInjection(createAction, {
-  providers: {
-    create,
-  },
-  validateToken: true, // When using Token Validator, the Request body must contain a valid Token from Twilio.
+// Export for Twilio
+exports.handler = useInjection(sendSmsHandler, {
+  providers: { sendSms: sendSmsProvider }
 });
 ```
 
-## EXTRAS
+### **Option 2: RxJS Effects API (Advanced & Powerful)**
 
-### # typeOf(Value) <sup><sub>Function</sub></sup>
+```javascript
+const { 
+  twilioEffect, 
+  injectEvent, 
+  injectClient, 
+  requireFields, 
+  ok, 
+  handleError 
+} = require('twilio-functions-utils');
 
-A simple method to discovery a value type. This is more specific then the original JavaScript `typeof`.
+const { switchMap, map } = require('rxjs/operators');
 
-It will return as `Array`, `Object`, `String`, `Number`, `Symbol`.
+const sendSmsEffect = context$ => 
+  context$.pipe(
+    requireFields('to', 'message'),
+    injectEvent(),
+    injectClient(),
+    switchMap(([event, client]) =>
+      client.messages.create({
+        to: event.to,
+        from: '+1234567890',
+        body: event.message
+      })
+    ),
+    map(result => ({ sid: result.sid, status: 'sent' })),
+    ok(),
+    handleError()
+  );
 
-##### [typeOf] Value <sup><sub>*</sub></sup>
-
-Could be any JavaScript primitive value to be type checked.
-
-#### Usage
-
-```js
-const { typeOf } = require('twilio-functions-utils');
-
-const type = typeOf('my name is Lorem');
-const typeArray = typeOf(['one', 'two']);
-const original = typeof ['one', 'two']
-
-console.log(type) // String
-console.log(typeArray) // Array
-console.log(original) // object
+exports.handler = twilioEffect(sendSmsEffect);
 ```
 
-### # Result <sup><sub>Class</sub></sup>
+---
 
-The Result class provides an organized and simple way to return errors without having to wrap every request in Try Catches.
+## 🔥 **Core Features**
 
-#### Methods
+### **🎭 Dependency Injection Made Simple**
 
-##### Result.ok(data)
+Access everything you need through clean `this` context:
 
-Use the `.ok` method to create a new Result instance with a data property and isError `false`.
-
-###### [Result.ok] data <sup><sub>*</sub></sup>
-
-The data value could be of any of the primitives types that javascript accpets.
-
-##### Result.failed(error)
-
-Use the `.failed` method to create a new Result instance with an error property and isError `true`.
-
-###### [Result.failed] error <sup><sub>(Error|*)</sub></sup>
-
-The data value must be preferably of Error type, but you can use any of the primitive ones...
-
-#### Properties
-
-##### Result.isError
-
-A boolean propety that return true when Result contain a defined error value.
-
-##### Result.data
-
-The successfully returned value.
-
-##### Result.error
-
-An Error like object throwed by the "action" as result.
-
-#### Usage
-
-```js
-const result = Result.ok(value);
-// or
-const result = Result.ok(await value);
-// or
-const result = Result.failed(error);
-
-
-if (result.isError) {
-  return new BadRequestError(result.error)
+```javascript
+async function myHandler(event) {
+  const { 
+    env,        // Environment variables
+    providers,  // Your business logic
+    request,    // HTTP headers & data
+    cookies     // Request cookies
+  } = this;
+  
+  // Your logic here...
 }
-
-return new Response(result.data)
 ```
 
-## TESTING
+### **📦 Result Pattern (No More Try-Catch Hell)**
 
-### # useMock(Function, Options) <sup><sub>Function</sub></sup>
-
-The Twilio Serverless structure make it hard for testing sometimes. So this provides a method that works perfectly with useInjection ready functions. The `useMock` act like useInjection but mocking some required fragments as `getAssets` and `getFunctions`.
-
-###### [useMock] Function <sup><sub>Function</sub></sup>
-
-The same function as used in `useInjection`.
-
-###### [useMock] Options.providers <sup><sub>Object</sub></sup>
-
-Unlike `useInjection`, the `useMock` method only receives the `Options.providers` property.
-
-#### Usage
-
-**(Required)** Set your `jest` testing script with `NODE_ENV=test`:
-
-```
-"scripts": {
-    "test": "NODE_ENV=test jest --collect-coverage --watchAll",
-    "start": "twilio-run",
-    "deploy": "twilio-run deploy"
+```javascript
+// In your providers
+const fetchUser = async function (userId) {
+  const { client, env } = this;
+  
+  try {
+    const user = await client.api.accounts(env.ACCOUNT_SID)
+      .calls
+      .list({ limit: 1 });
+    
+    return Result.ok(user[0]);
+  } catch (error) {
+    return Result.failed('User not found');
   }
-```
+};
 
-Your files structures must be have `assets` and `functions` into first or second levels starting from `src` (when in second level):
+// In your handlers
+const userResult = await this.providers.fetchUser(event.userId);
 
-```
-app/
-├─ package.json
-├─ node_modules/
-├─ src/
-│  ├─ functions/
-│  ├─ assets/
-```
-
-or:
-
-```
-app/
-├─ package.json
-├─ functions/
-├─ assets/
-├─ node_modules/
-```
-
-Exports your function to be tested and your handler so it can be used by Twilio when in runtime:
-
-```js
-async function functionToBeTested(event) {
-  const something = await this.providers.myCustomProvider(event)
-  return Response(something)
+if (userResult.isError) {
+  return new NotFoundError(userResult.error);
 }
 
-const handler = useInjection(functionToBeTested, {
-  providers: {
-    myCustomProvider,
-  },
-});
-
-module.exports = { functionToBeTested, handler }; // <--
+return new Response(userResult.data);
 ```
 
-**(Required)** You always need to import the `twilio.mock` for Response Twilio Global object on your testing files begining.
+### **🎯 Smart Response Handling**
 
-```js
-require('twilio-functions-utils/lib/twilio.mock');
+```javascript
+// JSON Responses
+return new Response({ success: true, data: results }, 201);
+
+// TwiML Responses
+const twiml = new Twilio.twiml.VoiceResponse();
+twiml.say('Hello from RxJS-powered Twilio!');
+return new TwiMLResponse(twiml.toString());
+
+// Error Responses
+return new BadRequestError('Invalid input');
+return new NotFoundError('Resource not found');
+return new UnauthorizedError('Access denied');
+return new InternalServerError('Something went wrong');
 ```
 
-Use Twilio Functions Utils `useMock` to do the hard job and just write your tests with the generated function.
-You can use `Twilio.mockRequestResolvedValue`, `Twilio.mockRequestImplementation`, `Twilio.mockRequestRejectedValue` to Mock your Twilio API requests.
+---
 
-```js
-/* global describe, it, expect */
+## 🔄 **RxJS Effects API**
 
-require('twilio-functions-utils/lib/twilio.mock');
+For advanced use cases, leverage the full power of reactive programming:
+
+### **Composition with Operators**
+
+```javascript
+const complexWorkflow = context$ =>
+  context$.pipe(
+    // Validation
+    requireFields('customerId', 'action'),
+    authenticated(ctx => ctx.event.token),
+    
+    // Data fetching
+    switchMap(ctx => 
+      ctx.providers.customerService.getProfile(ctx.event.customerId)
+    ),
+    
+    // Business logic
+    map(customer => ({
+      id: customer.id,
+      name: customer.name,
+      tier: customer.subscriptions.length > 0 ? 'premium' : 'basic'
+    })),
+    
+    // Response formatting
+    apiResponse({ message: 'Profile retrieved successfully' }),
+    
+    // Error handling
+    handleError(error => {
+      if (error.code === 'CUSTOMER_NOT_FOUND') {
+        return new NotFoundError('Customer not found');
+      }
+      return null; // Use default error handling
+    })
+  );
+```
+
+### **Built-in Operators**
+
+```javascript
+// Validation
+requireFields('email', 'phone')
+validateEvent(event => event.email.includes('@'))
+authenticated(ctx => checkApiKey(ctx.event.apiKey))
+
+// Data injection
+injectEvent()           // Get event data
+injectEnv()            // Get environment vars
+injectClient()         // Get Twilio client
+injectProviders()      // Get all providers
+injectProvider('userService')  // Get specific provider
+
+// Response formatting
+ok()                   // 200 response
+created()              // 201 response  
+apiResponse({ meta: { version: '1.0' } })
+toTwiMLResponse()      // Convert TwiML to response
+
+// Error handling
+handleError()          // Comprehensive error handling
+retryWithBackoff(3)    // Retry failed operations
+timeoutWithError(5000) // Timeout after 5 seconds
+fallback(defaultValue) // Provide fallback value
+```
+
+---
+
+## 🧪 **Testing Made Easy**
+
+### **Simple Testing (Original API)**
+
+```javascript
+require('twilio-functions-utils/dist/lib/twilio.mock.js');
 
 const { useMock, Response } = require('twilio-functions-utils');
-const { functionToBeTested } = require('../../functions/functionToBeTested'); // <-- Import here!
+const { myHandler } = require('../functions/myHandler');
 
-// Create the test function from the function to be tested
-const fn = useMock(functionToBeTested, {
+const mockFn = useMock(myHandler, {
   providers: {
-    myCustomProvider: async (sid) => ({ sid }), // Mock the providers implementation.
+    sendSms: async (to, message) => ({ sid: 'SM123', status: 'sent' })
   },
-  env: {
-    YOUR_ENV_VAR: 'value'
-  },
-  client: {
-    functionToMock: {}
-  }
+  env: { ACCOUNT_SID: 'AC123' },
+  client: { /* mock Twilio client */ }
 });
 
-describe('Function functionToBeTested', () => {
-  it('if {"someValue": true}', async () => {
-    const request = { TaskSid: '1234567', TaskAttributes: '{"someValue": true}' };
+test('should send SMS successfully', async () => {
+  const result = await mockFn({ to: '+1234567890', message: 'Hello!' });
+  
+  expect(result).toBeInstanceOf(Response);
+  expect(result.statusCode).toBe(201);
+});
+```
 
-    Twilio.mockRequestResolvedValue({
-      statusCode: 200,
-      body: {
-        sid: '1234567'
-      }
-    })
-    
-    Twilio.mockRequestResolvedValue({
-      statusCode: 200,
-      body: {
-        key: "MP****",
-        data: { sid: '7654321' }
-      }
-    })
+### **Advanced Testing (RxJS Effects)**
 
-    const res = await fn(request);
-    
-    const customMap = await Runtime.getSync().maps("MP****").fetch();
+```javascript
+const { testEffect, marbleTest, expectEmissions } = require('twilio-functions-utils');
 
-    expect(res).toBeInstanceOf(Response);
-    expect(res.body).not.toEqual(request);
-    expect(res.data).toEqual({ sid: '7654321' });
-    expect(res.body).toEqual({ sid: '1234567' });
+test('should handle SMS sending with marble testing', () => {
+  marbleTest(({ cold, expectObservable }) => {
+    const context$ = cold('a|', {
+      a: { event: { to: '+1234567890', message: 'Test' } }
+    });
+
+    const result$ = sendSmsEffect(context$);
+
+    expectObservable(result$).toBe('a|', {
+      a: expect.objectContaining({ statusCode: 200 })
+    });
   });
 });
 ```
 
-## AUTHOR
+---
 
-- [Iago Calazans](https://github.com/iagocalazans) - 🛠 Senior Node.js Engineer at [Stone](https://www.stone.com.br/)
+## 🔒 **Flex Integration**
+
+Built-in support for Twilio Flex token validation:
+
+```javascript
+// Simple API
+exports.handler = useInjection(myHandler, {
+  providers: { taskService },
+  validateToken: true  // Automatically validates Flex tokens
+});
+
+// RxJS API  
+const flexEffect = context$ =>
+  context$.pipe(
+    validateFlexToken(),  // Validates token from event.Token
+    // ... rest of your logic
+  );
+
+// Custom token validation
+const customFlexEffect = context$ =>
+  context$.pipe(
+    validateFlexTokenWithOptions({
+      tokenField: 'customToken',
+      onValidation: (result) => console.log('Token validated:', result)
+    }),
+    // ... rest of your logic
+  );
+```
+
+---
+
+## 📚 **Migration Guide**
+
+### **From v1.x to v2.x: Zero Breaking Changes! 🎉**
+
+Your existing code works without any modifications:
+
+```javascript
+// This code works exactly the same in v2.x
+const { useInjection, Response, Result } = require('twilio-functions-utils');
+
+async function existingHandler(event) {
+  const result = await this.providers.existingProvider(event);
+  return new Response(result.data);
+}
+
+exports.handler = useInjection(existingHandler, {
+  providers: { existingProvider }
+});
+```
+
+But now you get:
+- ✅ **Better error handling** with reactive streams
+- ✅ **Enhanced testing** capabilities
+- ✅ **Improved performance** through optimized processing
+- ✅ **Optional access** to RxJS operators when needed
+
+---
+
+## 🛠 **API Reference**
+
+### **Core Functions**
+
+| Function | Description |
+|----------|-------------|
+| `useInjection(fn, options)` | Main dependency injection wrapper |
+| `twilioEffect(effect, options)` | RxJS Effects wrapper |
+| `useMock(fn, options)` | Testing utility (test environment only) |
+
+### **Response Classes**
+
+| Class | Status Code | Usage |
+|-------|-------------|-------|
+| `Response(body, statusCode)` | Custom | General responses |
+| `TwiMLResponse(twiml)` | 200 | TwiML responses |
+| `BadRequestError(message)` | 400 | Invalid input |
+| `UnauthorizedError(message)` | 401 | Authentication required |
+| `NotFoundError(message)` | 404 | Resource not found |
+| `InternalServerError(message)` | 500 | Server errors |
+
+### **Utility Classes**
+
+| Class | Description |
+|-------|-------------|
+| `Result.ok(data)` | Success result wrapper |
+| `Result.failed(error)` | Error result wrapper |
+| `typeOf(value)` | Enhanced type checking |
+
+---
+
+## 🤝 **Contributing**
+
+We welcome contributions! Here's how you can help:
+
+1. **🐛 Report bugs** - Open an issue with reproduction steps
+2. **💡 Suggest features** - Describe your use case and proposed solution  
+3. **📝 Improve docs** - Help make our documentation clearer
+4. **🧪 Write tests** - Add test cases for new features
+5. **🔧 Submit PRs** - Follow our coding standards and include tests
+
+---
+
+## 📄 **License**
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+---
+
+## 👨‍💻 **Author**
+
+**[Iago Calazans](https://github.com/iagocalazans)** - Senior Node.js Engineer at [Stone](https://www.stone.com.br/)
+
+---
+
+<div align="center">
+
+**⭐ If this library helps you build amazing Twilio Functions, give it a star! ⭐**
+
+Made with ❤️ and ☕ for the Twilio community
+
+</div>

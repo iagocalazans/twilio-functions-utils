@@ -1,3 +1,11 @@
+// Re-export everything from the new RxJS implementation
+export * from './use.injection.rxjs';
+
+/*
+ * Original implementation kept for reference
+ * The new RxJS-based implementation above replaces this functionality
+ * while maintaining 100% API compatibility
+ */
 import * as flexTokenValidator from 'twilio-flex-token-validator';
 import * as _ from 'lodash';
 import { Twilio } from 'twilio';
