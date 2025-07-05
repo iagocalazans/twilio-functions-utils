@@ -1,19 +1,17 @@
-/* global Twilio */
+// Twilio global types are already declared in default.response.ts
 
 /**
  * The TwiMLResponse is the must return value on your CustomFn when you should return a Twilio TwiML.
- *
- * @class
- *
- * @extends { external:"Twilio.Response" }
  */
-class TwiMLResponse extends Twilio.Response {
+export class TwiMLResponse extends (Twilio.Response as any) {
   /**
-   * @param {(string|object)} body You can pass a string or a VoiceResponse object
-   * @param {number} statusCode
-   * @returns {TwiMLResponse}
+   * @param body You can pass a string or a VoiceResponse object
+   * @param statusCode HTTP status code
    */
-  constructor(body = '<?xml version="1.0" encoding="UTF-8"?><Response />', statusCode = 200) {
+  constructor(
+    body: string | { toString(): string } = '<?xml version="1.0" encoding="UTF-8"?><Response />',
+    statusCode: number = 200
+  ) {
     super({ statusCode, body });
 
     this.appendHeader('Access-Control-Allow-Origin', '*');
@@ -35,8 +33,4 @@ class TwiMLResponse extends Twilio.Response {
 
     return this;
   }
-
-  [Symbol.toStringTag] = this.constructor.name;
 }
-
-module.exports = { TwiMLResponse };
