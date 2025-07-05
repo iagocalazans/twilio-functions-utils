@@ -398,7 +398,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 👨‍💻 **Author**
 
-**[Iago Calazans](https://github.com/iagocalazans)** - Senior Node.js Engineer at [Stone](https://www.stone.com.br/)
+**[Iago Calazans](https://github.com/iagocalazans)** - Senior Node.js Engineer
 
 ---
 
