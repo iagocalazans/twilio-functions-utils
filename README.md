@@ -474,12 +474,12 @@ const customFlexEffect = context$ =>
 
 ## 📚 **Migration Guide**
 
-### **From v1.x to v2.x: Zero Breaking Changes! 🎉**
+### **From v2.4.x to v2.5.0: Zero Breaking Changes! 🎉**
 
 Your existing code works without any modifications:
 
 ```javascript
-// This code works exactly the same in v2.x
+// This code works exactly the same in v2.5.0
 const { useInjection, Response, Result } = require('twilio-functions-utils');
 
 async function existingHandler(event) {
@@ -492,11 +492,12 @@ exports.handler = useInjection(existingHandler, {
 });
 ```
 
-But now you get:
-- ✅ **Better error handling** with reactive streams
-- ✅ **Enhanced testing** capabilities
-- ✅ **Improved performance** through optimized processing
-- ✅ **Optional access** to RxJS operators when needed
+### **What's New in v2.5.0:**
+- ✅ **RxJS-Powered Architecture** - Enhanced reactive stream processing under the hood
+- ✅ **Advanced Effects API** - Optional RxJS Effects for complex workflows
+- ✅ **Enhanced Testing** - Marble testing and improved mocking capabilities
+- ✅ **Better Performance** - Optimized stream processing and error handling
+- ✅ **Full TypeScript Support** - Complete type safety with proper inference
 
 ---
 
@@ -637,12 +638,6 @@ We welcome contributions! Here's how you can help:
 - 🔀 **[Pull Requests](https://github.com/iagocalazans/twilio-functions-utils/pulls)** - Code contributions welcome
 - 📖 **[Contributing Guide](https://github.com/iagocalazans/twilio-functions-utils/blob/master/CONTRIBUTING.md)** - How to contribute
 - 🧪 **[Running Tests](https://github.com/iagocalazans/twilio-functions-utils#testing)** - Test your changes
-
-### **📊 Project Stats**
-- ![npm downloads](https://img.shields.io/npm/dw/twilio-functions-utils?style=flat-square)
-- ![GitHub stars](https://img.shields.io/github/stars/iagocalazans/twilio-functions-utils?style=flat-square)
-- ![GitHub issues](https://img.shields.io/github/issues/iagocalazans/twilio-functions-utils?style=flat-square)
-- ![Coverage Status](https://img.shields.io/coveralls/github/iagocalazans/twilio-functions-utils?style=flat-square)
 
 ---
 
