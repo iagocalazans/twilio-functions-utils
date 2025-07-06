@@ -24,6 +24,8 @@ interface MockEvent {
   [key: string]: any;
 }
 
+let useMock: any;
+
 if (process.env.NODE_ENV === 'test') {
   const functionsPath = fs.existsSync(path.join('.', 'src', 'functions'))
     ? './src/functions'
@@ -45,7 +47,12 @@ if (process.env.NODE_ENV === 'test') {
     nodir: true,
   });
 
-  const service = Twilio.sync.services('default');
+  const service = (global as any).Twilio?.sync?.services?.('default') || {
+    maps: {},
+    lists: {},
+    syncMaps: {},
+    syncLists: {}
+  };
 
   service.maps = service.syncMaps;
   service.lists = service.syncLists;
@@ -82,7 +89,7 @@ if (process.env.NODE_ENV === 'test') {
    * RxJS-powered mock function that maintains exact compatibility with original useMock
    * Now uses reactive streams under the hood for better testing capabilities
    */
-  const useMock = <
+  useMock = <
     Data = Record<string, any>,
     Env extends EnvironmentVars = any,
     Providers extends Record<string, ProviderFunction> = any
@@ -93,7 +100,7 @@ if (process.env.NODE_ENV === 'test') {
     async function (...args: [MockEvent]): Promise<any> {
       const [event] = args;
 
-      const getTwilioClient = () => Twilio;
+      const getTwilioClient = () => (global as any).Twilio || {};
 
       const providers =
         _.isUndefined(params?.providers) || !_.isPlainObject(params?.providers)
@@ -108,58 +115,32 @@ if (process.env.NODE_ENV === 'test') {
           ? getTwilioClient()
           : params.client;
 
-      // Convert the regular function to an RxJS Effect for testing
-      const effect = (context$: any) =>
-        context$.pipe(
-          (source: any) => 
-            source.switchMap((context: any) => {
-              const { event, env, providers, request } = context;
-              
-              // Create the 'this' context exactly like the original useMock
-              const injectorThis: InjectorThis<Env, Providers> = {
-                request: request?.headers || {},
-                cookies: request?.cookies || {},
-                env: env as any,
-                providers: providers as Providers
-              };
-              
-              // Execute the original function with proper 'this' binding
-              try {
-                const result = fn.call(injectorThis, event);
-                
-                // Handle both sync and async results
-                if (result instanceof Promise) {
-                  return result;
-                }
-                
-                return Promise.resolve(result);
-              } catch (error) {
-                throw error;
-              }
-            })
-        );
+      // Create the mock context directly like the original useMock (no RxJS needed for mock)
+      const providerThat = {
+        client,
+        env,
+      };
 
-      // Convert providers to RxJS format
-      const providersFactory = Object.entries(providers).reduce((acc, [key, providerFn]) => {
-        acc[key] = ({ client, env }: { client: any; env: any }) => {
-          return (...args: any[]) => {
-            const providerThis = { client, env };
-            return providerFn.call(providerThis, ...args);
-          };
-        };
-        return acc;
-      }, {} as any);
+      const { request: eventRequest, cookies: eventCookies, ...values } = event;
+
+      const providerNames = Object.keys(providers);
+
+      const that: InjectorThis<Env, Providers> = {
+        request: eventRequest || {},
+        cookies: eventCookies || {},
+        env: env as any,
+        providers: providerNames.reduce((p, c) => {
+          Reflect.defineProperty(p, c, {
+            value: providers[c].bind(providerThat as any),
+            enumerable: true,
+          });
+          return p;
+        }, {} as any),
+      };
 
       try {
-        // Use the RxJS testing system but maintain original API
-        return await mockEffect(effect, {
-          event,
-          env,
-          client,
-          providers: providersFactory,
-          headers: event.request?.headers || {},
-          cookies: event.cookies || {}
-        }).toPromise();
+        // Execute the function directly like the original useMock
+        return await fn.apply(that, [values as any]);
       } catch (err: any) {
         if (typeof err === 'string') {
           return new UnauthorizedError(err);
@@ -169,8 +150,11 @@ if (process.env.NODE_ENV === 'test') {
       }
     };
 
-  module.exports = { useMock };
 } else {
-  // Export empty object when not in test mode
-  module.exports = {};
+  // Export empty function when not in test mode
+  useMock = () => {
+    throw new Error('useMock is only available in test environment');
+  };
 }
+
+export { useMock };

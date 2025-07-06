@@ -42,6 +42,11 @@ export class Response extends (Twilio.Response as any) {
     this.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
     this.appendHeader('Content-Type', 'application/json');
 
-    this.setBody(_.omit(body as any, ['_version', '_solution', '_context']));
+    // Preserve arrays, only omit Twilio internal properties from objects
+    if (Array.isArray(body)) {
+      this.setBody(body);
+    } else {
+      this.setBody(_.omit(body as any, ['_version', '_solution', '_context']));
+    }
   }
 }

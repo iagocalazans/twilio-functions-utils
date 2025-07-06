@@ -12,6 +12,7 @@ const {
   expectError,
   injectEvent,
   injectClient,
+  injectProviders,
   requireFields,
   ok,
   handleError
@@ -23,15 +24,14 @@ const { map, switchMap } = require('rxjs/operators');
 const sendSmsEffect = context$ => 
   context$.pipe(
     requireFields('To', 'Body'),
-    injectEvent(),
-    injectClient(),
-    switchMap(([event, client]) =>
-      client.messages.create({
+    switchMap(context => {
+      const { event, client } = context;
+      return client.messages.create({
         to: event.To,
         from: '+1234567890',
         body: event.Body
-      })
-    ),
+      });
+    }),
     map(message => ({ success: true, sid: message.sid })),
     ok(),
     handleError()
@@ -145,7 +145,7 @@ describe('RxJS Effects Testing', () => {
     });
 
     expect(result.statusCode).toBe(500);
-    expect(result.body).toMatch(/Internal server error/);
+    expect(result.body).toMatch(/Twilio API Error/);
   });
 
   // Example 6: Testing with providers

@@ -54,7 +54,7 @@ export const requireEnvVars = <Env = {}, Providers = {}>(
       const missingVars = vars.filter(varName => !context.env[varName]);
       return missingVars.length === 0
         ? of(context)
-        : throwError(() => new Error(`Missing environment variables: ${missingVars.join(', ')}`));
+        : throwError(() => new BadRequestError(`Missing environment variables: ${missingVars.join(', ')}`));
     })
   );
 

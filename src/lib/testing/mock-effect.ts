@@ -170,8 +170,14 @@ function initializeMockProviders<Env, Providers>(
   
   const providers: any = {};
   
-  for (const [key, factory] of Object.entries(providersFactory)) {
-    providers[key] = (factory as any)(context);
+  for (const [key, value] of Object.entries(providersFactory)) {
+    // If value is a function, treat it as a factory
+    if (typeof value === 'function') {
+      providers[key] = (value as any)(context);
+    } else {
+      // Otherwise, use the value directly (for testing convenience)
+      providers[key] = value;
+    }
   }
   
   return providers as Providers;

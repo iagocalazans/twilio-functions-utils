@@ -1,5 +1,5 @@
 // Re-export everything from the new RxJS implementation
-export * from './use.mock.rxjs';
+export { useMock } from './use.mock.rxjs';
 
 /*
  * Original implementation kept for reference
@@ -70,7 +70,12 @@ if (process.env.NODE_ENV === 'test') {
     nodir: true,
   });
 
-  const service = Twilio.sync.services('default');
+  const service = (global as any).Twilio?.sync?.services?.('default') || {
+    maps: {},
+    lists: {},
+    syncMaps: {},
+    syncLists: {}
+  };
 
   service.maps = service.syncMaps;
   service.lists = service.syncLists;
@@ -113,7 +118,7 @@ if (process.env.NODE_ENV === 'test') {
     async function (...args: [MockEvent]): Promise<any> {
       const [event] = args;
 
-      const getTwilioClient = () => Twilio;
+      const getTwilioClient = () => (global as any).Twilio || {};
 
       const providers =
         _.isUndefined(params?.providers) || !_.isPlainObject(params?.providers)

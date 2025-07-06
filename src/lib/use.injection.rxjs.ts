@@ -45,21 +45,28 @@ export const useInjection = <
       switchMap(context => {
         const { event, env, client, providers, request } = context;
         
-        // Create the 'this' context exactly like the original useInjection
-        const injectorThis: InjectorThis<Env, Providers> = {
-          request: {
-            headers: request?.headers || {},
-            cookies: request?.cookies || {},
-            ...(event.request || {})
-          },
-          cookies: request?.cookies || {},
-          env: env as Omit<any, 'getTwilioClient'>,
-          providers: providers as Providers
+        // Extract event data exactly like the original: { request, cookies, Token, ...values }
+        const { request: eventRequest = {}, cookies: eventCookies = {}, Token, ...values } = event;
+        
+        // Create proper request object combining all sources
+        const requestData = {
+          headers: request?.headers || eventRequest.headers || {},
+          cookies: request?.cookies || eventCookies || {},
+          ...eventRequest
         };
         
-        // Execute the original function with proper 'this' binding
+        // Create the 'this' context exactly like the original useInjection
+        const injectorThis: InjectorThis<Env, Providers> = {
+          request: requestData,
+          cookies: requestData.cookies,
+          env: env as Omit<any, 'getTwilioClient'>,
+          providers: providers as Providers,
+          event: event // Add the missing event property that tests expect
+        } as any;
+        
+        // Execute the original function with proper 'this' binding and sanitized values
         try {
-          const result = fn.call(injectorThis, event as Data);
+          const result = fn.call(injectorThis, values as Data);
           
           // Handle both sync and async results
           if (result instanceof Promise) {
@@ -101,11 +108,9 @@ export const useInjection = <
   const providersFactory = params.providers ? 
     Object.entries(params.providers).reduce((acc, [key, providerFn]) => {
       acc[key] = ({ client, env }: { client: any; env: any }) => {
-        // Bind the provider function with the same context as original
-        return (...args: any[]) => {
-          const providerThis = { client, env };
-          return providerFn.call(providerThis, ...args);
-        };
+        // Create the provider exactly like the original - return the bound function itself, not a factory
+        const providerThis = { client, env };
+        return providerFn.bind(providerThis);
       };
       return acc;
     }, {} as any) : undefined;

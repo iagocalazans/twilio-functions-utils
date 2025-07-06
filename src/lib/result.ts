@@ -44,7 +44,7 @@ export class Result<T = any, E = Error> {
    * @readonly
    */
   get data(): T {
-    if (typeOf(this._error) !== 'Undefined') {
+    if (typeOf(this._error) !== 'undefined') {
       throw new Error('This is not a successful request. Result with error type instead.');
     }
 
@@ -56,7 +56,7 @@ export class Result<T = any, E = Error> {
    * @readonly
    */
   get error(): E {
-    if (typeOf(this._data) !== 'Undefined') {
+    if (typeOf(this._data) !== 'undefined') {
       throw new Error('This is a successful request. Result with data type instead.');
     }
 

@@ -89,9 +89,27 @@ export async function expectEmissions<T>(
  * Asserts that an observable errors with a specific error
  */
 export async function expectError<E = any>(
-  observable: Observable<any>,
+  observableOrPromise: Observable<any> | Promise<any>,
   errorMatcher?: (error: E) => boolean | void
 ): Promise<E> {
+  // Handle promises
+  if (observableOrPromise instanceof Promise) {
+    try {
+      await observableOrPromise;
+      throw new Error('Expected promise to reject but it resolved');
+    } catch (error) {
+      if (errorMatcher) {
+        const result = errorMatcher(error as E);
+        if (result === false) {
+          throw new Error('Error did not match expected criteria');
+        }
+      }
+      return error as E;
+    }
+  }
+  
+  // Handle observables
+  const observable = observableOrPromise as Observable<any>;
   return new Promise((resolve, reject) => {
     observable.subscribe({
       next: () => reject(new Error('Expected observable to error but it emitted a value')),

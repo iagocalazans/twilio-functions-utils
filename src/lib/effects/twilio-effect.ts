@@ -1,4 +1,4 @@
-import { Observable, from, of, throwError, forkJoin, isObservable } from 'rxjs';
+import { Observable, from, of, throwError, forkJoin, isObservable, firstValueFrom } from 'rxjs';
 import { catchError, map, mergeMap, take } from 'rxjs/operators';
 import * as Twilio from 'twilio';
 import { ServerlessCallback } from '@twilio-labs/serverless-runtime-types/types';
@@ -108,7 +108,7 @@ async function initializeProviders<Env, Providers>(
   
   // Wait for all async providers
   if (Object.keys(providerPromises).length > 0) {
-    const resolvedProviders = await forkJoin(providerPromises).toPromise();
+    const resolvedProviders = await firstValueFrom(forkJoin(providerPromises));
     Object.assign(providers, resolvedProviders);
   }
   

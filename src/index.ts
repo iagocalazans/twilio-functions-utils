@@ -2,8 +2,8 @@
 export { useInjection } from './lib/use.injection';
 export { typeOf } from './lib/type-of';
 export { Result } from './lib/result';
-// Note: useMock is only available in test environment
-// export { useMock } from './lib/use.mock';
+// useMock is only available in test environment
+export { useMock } from './lib/use.mock';
 
 // RxJS-based Effects API
 export { twilioEffect } from './lib/effects/twilio-effect';

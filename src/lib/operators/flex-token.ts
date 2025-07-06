@@ -23,9 +23,17 @@ export const validateFlexToken = <Env = {}, Providers = {}>() =>
         return throwError(() => new Error('Missing ACCOUNT_SID or AUTH_TOKEN in environment'));
       }
       
-      // Validate token using twilio-flex-token-validator
+      // Validate token using twilio-flex-token-validator (callback-based)
       return from(
-        validator(token, ACCOUNT_SID, AUTH_TOKEN)
+        new Promise((resolve, reject) => {
+          validator(token, ACCOUNT_SID, AUTH_TOKEN, {}, (error: any, result: any) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          });
+        })
       ).pipe(
         mergeMap((validationResult: any) => {
           if (validationResult.valid) {
@@ -86,7 +94,15 @@ export const validateFlexTokenWithOptions = <Env = {}, Providers = {}>(
       }
       
       return from(
-        validator(token, accountSid, authToken)
+        new Promise((resolve, reject) => {
+          validator(token, accountSid, authToken, {}, (error: any, result: any) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          });
+        })
       ).pipe(
         mergeMap((validationResult: any) => {
           if (options.onValidation) {
