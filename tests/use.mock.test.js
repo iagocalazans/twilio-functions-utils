@@ -1,170 +1,199 @@
-/* global jest, describe, it, expect, Runtime, Twilio */
+const { useMock, Result } = require('../dist');
 
-require('../lib/twilio.mock');
-const fs = require('fs');
-
-const fsCalls = jest.spyOn(fs, 'existsSync');
-
-const {
-  useMock,
-  BadRequestError,
-  InternalServerError,
-  Response,
-  TwiMLResponse,
-  NotFoundError,
-  UnauthorizedError,
-} = require('../index');
-
-const responseTypes = {
-  twiml: (provided) => new TwiMLResponse(provided.twiml),
-  badRequest: () => new BadRequestError(),
-  internalServer: () => new InternalServerError(),
-  notFound: () => new NotFoundError(),
-  response: (provided) => new Response({ ...provided }),
-  responseAsString: (provided) => new Response(provided.message),
-};
-
-const { functionUsedToTest } = require(Runtime.getFunctions()['use-to-test'].path);
-const { assetUsedToTest } = require(Runtime.getAssets()['/use-to-test.js'].path);
-
-async function useItToMock(event) {
-  const provided = this.providers.useItAsProvider(event);
-
-  if (event.forceFail) {
-    throw new Error('Check fail condition!');
-  }
-
-  if (event.forceUnauthorized) {
-    // eslint-disable-next-line no-throw-literal
-    throw 'forceUnauthorized condition!';
-  }
-
-  const reprovided = await this.providers
-    .functionUsedToTest(this.providers
-      .assetUsedToTest(event));
-
-  return responseTypes[provided.type](reprovided);
-}
-
-function useItAsProvider(event) {
-  Object.defineProperty(
-    event, 'evaluated', {
-      value: true,
-      enumerable: true,
-    },
-  );
-
-  return event;
-}
-
-const fn = useMock(useItToMock, {
-  providers: {
-    useItAsProvider,
-    functionUsedToTest,
-    assetUsedToTest,
-  },
-  env: {
-    SOMETEST_VAR: 'VariableDefined',
-  },
-});
-
-describe('Function useMock', () => {
-  it('Should respond with an InternalServerError Instance', async () => {
-    Twilio.mockRequestResolvedValue({
-      statusCode: 200,
-      body: {
-        sid: 'CA****', account_sid: 'AC****', to: '+55***********', from: '+55***********', parent_call_sid: 'CA****',
-      },
-    });
-    const callback = await fn({
-      type: 'internalServer', forceFail: false, to: '+55***********', from: '+55***********',
-    });
-
-    expect(callback).toBeInstanceOf(InternalServerError);
-    expect(callback.body).toEqual('[ InternalServerError ]: The server encountered an unexpected condition that prevented it from fulfilling the request!');
+describe('useMock', () => {
+  // Ensure NODE_ENV is test
+  beforeAll(() => {
+    process.env.NODE_ENV = 'test';
   });
 
-  it('Should respond with an InternalServerError Instance', async () => {
-    const callback = await fn({ type: 'internalServer', forceFail: true });
-
-    expect(callback).toBeInstanceOf(InternalServerError);
-    expect(callback.body).toEqual('[ InternalServerError ]: Check fail condition!');
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('Should respond with a Response Instance', async () => {
-    Twilio.mockRequestResolvedValue({
-      statusCode: 200,
-      body: {
-        sid: 'CA****', account_sid: 'AC****', to: '+55*****1*****', from: '+55*****2*****', parent_call_sid: 'CA****',
-      },
-    });
-    const callback = await fn({
-      type: 'response', forceFail: false, to: '+55*****1*****', from: '+55*****2*****',
+  it('should create testable version of function', async () => {
+    const testFunction = async function() {
+      return Result.ok({ 
+        message: 'Test response',
+        env: this.env.TEST_VAR
+      });
+    };
+
+    const { response } = await useMock(testFunction, {
+      env: { TEST_VAR: 'test-value' }
     });
 
-    expect(callback).toBeInstanceOf(Response);
-    expect(callback.body).toMatchObject({
-      sid: 'CA****',
-      parentCallSid: 'CA****',
-      accountSid: 'AC****',
-      to: '+55*****1*****',
-      from: '+55*****2*****',
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      message: 'Test response',
+      env: 'test-value'
     });
   });
 
-  it('Should respond with a InternalServerError when request rejects', async () => {
-    Twilio.mockRequestRejectedValue(new Error('Something failed on the process.'));
+  it('should inject providers', async () => {
+    const testFunction = async function() {
+      const user = await this.providers.userService.getUser('123');
+      return Result.ok({ user });
+    };
 
-    const callback = await fn({
-      type: 'response', forceFail: false, to: '+55*****1*****', from: '+55*****2*****',
+    const { response } = await useMock(testFunction, {
+      providers: {
+        userService: async function() {
+          return {
+            getUser: (id) => ({ id, name: 'Test User' })
+          };
+        }
+      }
     });
 
-    expect(callback).toBeInstanceOf(InternalServerError);
-    expect(callback.body).toBe('[ InternalServerError ]: Something failed on the process.');
+    expect(response.body).toEqual({
+      user: { id: '123', name: 'Test User' }
+    });
   });
 
-  it('Should respond with an UnauthorizedError Instance', async () => {
-    const callback = await fn({ type: 'response', forceFail: false, forceUnauthorized: true });
+  it('should handle errors', async () => {
+    const testFunction = async function() {
+      throw new Error('Test error');
+    };
 
-    expect(callback).toBeInstanceOf(UnauthorizedError);
-    expect(callback.body).toMatch('[ UnauthorizedError ]: forceUnauthorized condition!');
+    const { response } = await useMock(testFunction);
+
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toContain('Test error');
   });
 
-  it('Should find paths for getFunctions and getAssets', async () => {
-    expect(fsCalls).toHaveBeenCalled();
+  it('should inject event data', async () => {
+    const testFunction = async function() {
+      return Result.ok({
+        to: this.event.To,
+        body: this.event.Body
+      });
+    };
 
-    expect(Runtime.getFunctions()['use-to-test'].path).toBe(`${process.cwd()
-    }/functions/use-to-test`);
-    expect(Runtime.getAssets()['/use-to-test.js'].path).toBe(`${process.cwd()
-    }/assets/use-to-test`);
-  });
-
-  it('Should throw an error while creating a syncMapItems without key', async () => {
-    try {
-      await Runtime.getSync().maps('SN****').syncMapItems.create({ data: { notToTeste: 'something' } });
-    } catch (err) {
-      expect(err).toBeInstanceOf(Error);
-      expect(err.message).toMatch("Required parameter \"opts['key']\" missing.");
-    }
-  });
-
-  it('Should find paths for getSync', async () => {
-    Twilio.mockRequestResolvedValue({
-      statusCode: 201,
-      body: { key: 'Call-undefined', data: { value: 'first' } },
+    const { response } = await useMock(testFunction, {
+      event: {
+        To: '+1234567890',
+        Body: 'Test message'
+      }
     });
 
-    Twilio.mockRequestResolvedValue({
-      statusCode: 200,
-      body: { key: 'Call-undefined', data: { teste: 'postUpdate' } },
+    expect(response.body).toEqual({
+      to: '+1234567890',
+      body: 'Test message'
+    });
+  });
+
+  it('should provide Twilio client', async () => {
+    const testFunction = async function() {
+      const hasClient = !!this.client;
+      const hasMessages = !!this.client.messages;
+      return Result.ok({ hasClient, hasMessages });
+    };
+
+    const { response } = await useMock(testFunction);
+
+    expect(response.body).toEqual({
+      hasClient: true,
+      hasMessages: true
+    });
+  });
+
+  it('should handle Result.failed', async () => {
+    const testFunction = async function() {
+      return Result.failed({ error: 'Validation failed' });
+    };
+
+    const { response } = await useMock(testFunction);
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toContain('Validation failed');
+  });
+
+  it('should handle plain object returns', async () => {
+    const testFunction = async function() {
+      return { plain: 'object' };
+    };
+
+    const { response } = await useMock(testFunction);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({ plain: 'object' });
+  });
+
+  it('should inject request headers and cookies', async () => {
+    const testFunction = async function() {
+      return Result.ok({
+        authHeader: this.request.headers.authorization,
+        sessionCookie: this.request.cookies.session
+      });
+    };
+
+    const { response } = await useMock(testFunction, {
+      event: {
+        request: {
+          headers: { authorization: 'Bearer token' },
+          cookies: { session: 'abc123' }
+        }
+      }
     });
 
-    const maps = await Runtime.getSync().maps('SN****').syncMapItems('SI****').fetch();
+    expect(response.body).toEqual({
+      authHeader: 'Bearer token',
+      sessionCookie: 'abc123'
+    });
+  });
 
-    expect(maps.data).toEqual({ value: 'first' });
+  it('should handle async provider initialization', async () => {
+    const testFunction = async function() {
+      const data = await this.providers.asyncService.getData();
+      return Result.ok({ data });
+    };
 
-    const updatedMaps = await maps.update({ teste: 'postUpdate' });
+    const { response } = await useMock(testFunction, {
+      providers: {
+        asyncService: async function() {
+          await new Promise(resolve => setTimeout(resolve, 10));
+          return {
+            getData: () => 'async data'
+          };
+        }
+      }
+    });
 
-    expect(updatedMaps.data).toEqual({ teste: 'postUpdate' });
+    expect(response.body).toEqual({ data: 'async data' });
+  });
+
+  it('should throw error if not in test environment', async () => {
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+
+    const testFunction = async function() {
+      return Result.ok({});
+    };
+
+    await expect(async () => {
+      await useMock(testFunction);
+    }).rejects.toThrow();
+
+    process.env.NODE_ENV = originalEnv;
+  });
+
+  it('should provide context similar to real Twilio', async () => {
+    const testFunction = async function() {
+      return Result.ok({
+        hasTwilioClient: typeof this.client.messages.create === 'function',
+        hasEnv: typeof this.env === 'object',
+        hasProviders: typeof this.providers === 'object',
+        hasEvent: typeof this.event === 'object'
+      });
+    };
+
+    const { response } = await useMock(testFunction);
+
+    expect(response.body).toEqual({
+      hasTwilioClient: true,
+      hasEnv: true,
+      hasProviders: true,
+      hasEvent: true
+    });
   });
 });

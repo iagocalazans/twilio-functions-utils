@@ -1,191 +1,239 @@
-/* global describe, it, expect, jest */
+const { useInjection, Result } = require('../dist');
 
-require('../lib/twilio.mock');
+describe('useInjection', () => {
+  // Mock Twilio handler parameters
+  const mockContext = {
+    getTwilioClient: jest.fn(() => ({
+      messages: { create: jest.fn() },
+      calls: { create: jest.fn() }
+    })),
+    DOMAIN_NAME: 'test.twilio.com',
+    PATH: '/test',
+    SERVICE_SID: 'IS123',
+    ENVIRONMENT_SID: 'ZE123'
+  };
+  
+  const mockEvent = {
+    To: '+1234567890',
+    Body: 'Test message',
+    From: '+0987654321'
+  };
+  
+  const mockCallback = jest.fn();
 
-const tokenValidator = require('twilio-flex-token-validator');
-
-jest.mock('twilio-flex-token-validator');
-
-const token = jest.spyOn(tokenValidator, 'validator');
-
-token.mockResolvedValue({ valid: false });
-
-const {
-  useInjection,
-  BadRequestError,
-  InternalServerError,
-  Response,
-  TwiMLResponse,
-  NotFoundError,
-} = require('../index');
-const { UnauthorizedError } = require('../lib/errors/unauthorized.error');
-
-const responseTypes = {
-  twiml: (provided) => new TwiMLResponse(provided.twiml),
-  badRequest: () => new BadRequestError(),
-  internalServer: () => new InternalServerError(),
-  notFound: () => new NotFoundError(),
-  response: (provided) => new Response(provided),
-  responseAsString: (provided) => new Response(provided.message),
-};
-
-function useItToMock(event) {
-  const provided = this.providers.useItAsProvider(event);
-
-  if (event.forceFail) {
-    throw new Error('Check fail condition!');
-  }
-
-  return responseTypes[provided.type](provided);
-}
-
-function useItAsProvider(event) {
-  Object.defineProperty(
-    event, 'evaluated', {
-      value: true,
-      enumerable: true,
-    },
-  );
-
-  return event;
-}
-
-const fn = useInjection(useItToMock, {
-  providers: {
-    useItAsProvider,
-
-  },
-});
-
-const fnWithToken = useInjection(useItToMock, {
-  providers: {
-    useItAsProvider,
-  },
-  validateToken: true,
-});
-
-const twilioContext = {
-  getTwilioClient() {
-
-  },
-  DOMAIN_NAME: 'https://localhost:3000',
-  ACCOUNT_SID: '',
-};
-const twilioCallback = function (err, response) {
-  if (err) {
-    return err;
-  }
-
-  return response;
-};
-
-function VoiceResponse() {
-  this.body = 'Response';
-
-  this.toString = () => this.body;
-}
-function VoiceXmlTag() {
-  this.body = '<?xml version="1.0" encoding="UTF-8"?><Response />';
-
-  this.toString = () => this.body;
-}
-
-describe('Function useInjection', () => {
-  it('Should respond with an InternalServerError Instance', async () => {
-    const callback = await fn(
-      twilioContext, { type: 'response', forceFail: true }, twilioCallback,
-    );
-
-    expect(callback).toBeInstanceOf(InternalServerError);
-    expect(callback.body).toEqual('[ InternalServerError ]: Check fail condition!');
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
-  it('Should respond with a TwiMLResponse Instance', async () => {
-    const callback = await fn(
-      twilioContext, { type: 'twiml' }, twilioCallback,
-    );
 
-    expect(callback).toBeInstanceOf(TwiMLResponse);
-    expect(callback.body).toEqual('<?xml version="1.0" encoding="UTF-8"?><Response />');
+  it('should inject function with providers and environment', async () => {
+    const testEnv = {
+      API_KEY: 'test-key',
+      API_SECRET: 'test-secret'
+    };
+    
+    const providers = {
+      customerService: async function() {
+        return {
+          getCustomer: (id) => ({ id, name: 'John Doe' })
+        };
+      }
+    };
+    
+    const handler = useInjection(async function() {
+      // env is derived from context, not from options
+      expect(this.providers).toBeDefined();
+      expect(this.client).toBeDefined();
+      
+      const customer = this.providers.customerService.getCustomer('123');
+      return Result.ok({ customer });
+    }, { providers });
+    
+    await handler(mockContext, mockEvent, mockCallback);
+    
+    expect(mockCallback).toHaveBeenCalledWith(null, expect.objectContaining({
+      _body: { customer: { id: '123', name: 'John Doe' } },
+      _statusCode: 200
+    }));
   });
-  it('Should respond with a TwiMLResponse Instance even if receives an Invalid Object', async () => {
-    const callback = await fn(
-      twilioContext, { type: 'twiml', twiml: {} }, twilioCallback,
-    );
 
-    expect(callback).toBeInstanceOf(TwiMLResponse);
-    expect(callback.body).toEqual('<?xml version="1.0" encoding="UTF-8"?><Response />');
+  it('should handle Result.ok responses', async () => {
+    const handler = useInjection(async function() {
+      return Result.ok({ success: true });
+    });
+    
+    await handler(mockContext, mockEvent, mockCallback);
+    
+    expect(mockCallback).toHaveBeenCalledWith(null, {
+      _data: { success: true },
+      _error: undefined
+    });
   });
-  it('Should respond with a TwiMLResponse Instance even if receives a valid TwimlResponse Object without the xml tag', async () => {
-    const callback = await fn(
-      twilioContext, { type: 'twiml', twiml: new VoiceResponse() }, twilioCallback,
-    );
 
-    expect(callback).toBeInstanceOf(TwiMLResponse);
-    expect(callback.body).toEqual('<?xml version="1.0" encoding="UTF-8"?><Response />');
+  it('should handle Result.failed responses', async () => {
+    const handler = useInjection(async function() {
+      return Result.failed({ error: 'Something went wrong' });
+    });
+    
+    await handler(mockContext, mockEvent, mockCallback);
+    
+    expect(mockCallback).toHaveBeenCalledWith(null, {
+      _data: undefined,
+      _error: { error: 'Something went wrong' }
+    });
   });
-  it('Should respond with a TwiMLResponse Instance even if receives a valid TwimlResponse Object', async () => {
-    const callback = await fn(
-      twilioContext, { type: 'twiml', twiml: new VoiceXmlTag() }, twilioCallback,
-    );
 
-    expect(callback).toBeInstanceOf(TwiMLResponse);
-    expect(callback.body).toEqual('<?xml version="1.0" encoding="UTF-8"?><Response />');
+  it('should handle thrown errors', async () => {
+    const handler = useInjection(async function() {
+      throw new Error('Unexpected error');
+    });
+    
+    await handler(mockContext, mockEvent, mockCallback);
+    
+    expect(mockCallback).toHaveBeenCalledWith(null, expect.objectContaining({
+      _statusCode: 500,
+      _body: expect.stringContaining('Unexpected error')
+    }));
   });
-  it('Should respond with a Response Instance', async () => {
-    const callback = await fn(
-      twilioContext, { type: 'response' }, twilioCallback,
-    );
 
-    expect(callback).toBeInstanceOf(Response);
-    expect(callback.body).toEqual({ evaluated: true, type: 'response' });
+  it('should handle direct Response returns', async () => {
+    const { Response } = require('../dist');
+    
+    const handler = useInjection(async function() {
+      return new Response({ message: 'Custom response' }, 201);
+    });
+    
+    await handler(mockContext, mockEvent, mockCallback);
+    
+    expect(mockCallback).toHaveBeenCalledWith(null, expect.objectContaining({
+      _statusCode: 201,
+      _body: { message: 'Custom response' }
+    }));
   });
-  it('Should respond with a Response as String Instance', async () => {
-    const callback = await fn(
-      twilioContext, { type: 'responseAsString', message: 'My message!' }, twilioCallback,
-    );
 
-    expect(callback).toBeInstanceOf(Response);
-    expect(callback.body).toEqual('My message!');
+  it('should inject request data from event', async () => {
+    const eventWithHeaders = {
+      ...mockEvent,
+      request: {
+        headers: {
+          'authorization': 'Bearer token123',
+          'content-type': 'application/json'
+        },
+        cookies: {
+          session: 'abc123'
+        }
+      }
+    };
+    
+    const handler = useInjection(async function() {
+      expect(this.request.headers['authorization']).toBe('Bearer token123');
+      expect(this.request.cookies.session).toBe('abc123');
+      return Result.ok({ received: true });
+    });
+    
+    await handler(mockContext, eventWithHeaders, mockCallback);
+    
+    expect(mockCallback).toHaveBeenCalledWith(null, expect.any(Object));
   });
-  it('Should respond with a BadRequestError Instance', async () => {
-    const callback = await fn(
-      twilioContext, { type: 'badRequest' }, twilioCallback,
-    );
 
-    expect(callback).toBeInstanceOf(BadRequestError);
-    expect(callback.body).toEqual('[ BadRequestError ]: The request sent to the server is invalid or corrupted!');
+  it('should work with provider factories returning observables', async () => {
+    const providers = {
+      dataService: async function() {
+        return { getData: () => 'observable data' };
+      }
+    };
+    
+    const handler = useInjection(async function() {
+      const data = this.providers.dataService.getData();
+      return Result.ok({ data });
+    }, { providers });
+    
+    await handler(mockContext, mockEvent, mockCallback);
+    
+    expect(mockCallback).toHaveBeenCalledWith(null, {
+      _data: { data: 'observable data' },
+      _error: undefined
+    });
   });
-  it('Should respond with a NotFoundError Instance', async () => {
-    const callback = await fn(
-      twilioContext, { type: 'notFound' }, twilioCallback,
-    );
 
-    expect(callback).toBeInstanceOf(NotFoundError);
-    expect(callback.body).toEqual('[ NotFoundError ]: The content you are looking for was not found!');
+  it('should handle provider initialization errors', async () => {
+    const providers = {
+      errorService: function() {
+        throw new Error('Provider init failed');
+      }
+    };
+    
+    const handler = useInjection(async function() {
+      return Result.ok({ success: true });
+    }, { providers });
+    
+    await handler(mockContext, mockEvent, mockCallback);
+    
+    expect(mockCallback).toHaveBeenCalledWith(null, expect.objectContaining({
+      _statusCode: 200,
+      _body: { success: true }
+    }));
   });
-  it('Should respond with a InternalServerError Instance', async () => {
-    const callback = await fn(
-      twilioContext, { type: 'internalServer' }, twilioCallback,
-    );
 
-    expect(callback).toBeInstanceOf(InternalServerError);
-    expect(callback.body).toEqual('[ InternalServerError ]: The server encountered an unexpected condition that prevented it from fulfilling the request!');
+  it('should pass event data to function context', async () => {
+    const handler = useInjection(async function() {
+      expect(this.event).toEqual(mockEvent);
+      expect(this.event.To).toBe('+1234567890');
+      expect(this.event.Body).toBe('Test message');
+      return Result.ok({ eventReceived: true });
+    });
+    
+    await handler(mockContext, mockEvent, mockCallback);
+    
+    expect(mockCallback).toHaveBeenCalledWith(null, {
+      _data: { eventReceived: true },
+      _error: undefined
+    });
   });
-  it('Should respond with a UnauthorizedError Instance', async () => {
-    const callback = await fnWithToken(
-      twilioContext, { type: 'response', Token: 'fake-token' }, twilioCallback,
-    );
 
-    expect(callback).toBeInstanceOf(UnauthorizedError);
-    expect(callback.body).toEqual('[ UnauthorizedError ]: The received request could not be verified!');
+  it('should handle async provider factories', async () => {
+    const providers = {
+      asyncService: async function() {
+        await new Promise(resolve => setTimeout(resolve, 10));
+        return { getValue: () => 'async value' };
+      }
+    };
+    
+    const handler = useInjection(async function() {
+      const value = this.providers.asyncService.getValue();
+      return Result.ok({ value });
+    }, { providers });
+    
+    await handler(mockContext, mockEvent, mockCallback);
+    
+    expect(mockCallback).toHaveBeenCalledWith(null, {
+      _data: { value: 'async value' },
+      _error: undefined
+    });
   });
-  it('Should respond with a UnauthorizedError Instance', async () => {
-    token.mockRejectedValue('Unauthorized: Token was not provided');
-    const callback = await fnWithToken(
-      twilioContext, { type: 'response' }, twilioCallback,
-    );
 
-    expect(callback).toBeInstanceOf(UnauthorizedError);
-    expect(callback.body).toEqual('[ UnauthorizedError ]: Unauthorized: Token was not provided');
+  it('should handle functions returning plain objects', async () => {
+    const handler = useInjection(async function() {
+      return { message: 'Plain object response' };
+    });
+    
+    await handler(mockContext, mockEvent, mockCallback);
+    
+    expect(mockCallback).toHaveBeenCalledWith(null, expect.objectContaining({
+      _statusCode: 200,
+      _body: { message: 'Plain object response' }
+    }));
+  });
+
+  it('should handle empty responses', async () => {
+    const handler = useInjection(async function() {
+      // Return nothing
+    });
+    
+    await handler(mockContext, mockEvent, mockCallback);
+    
+    expect(mockCallback).toHaveBeenCalledWith(null, expect.objectContaining({
+      _statusCode: 200,
+      _body: {}
+    }));
   });
 });
