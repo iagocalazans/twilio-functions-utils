@@ -7,6 +7,171 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [2.5.0] - 2025-01-06
+
+### 🚀 Major Features
+
+#### **RxJS-Powered Architecture**
+- **Complete rewrite** of the core dependency injection system using RxJS reactive streams
+- **100% backward compatibility** - all existing code works without any changes
+- Enhanced performance through optimized stream processing
+- Better error handling and recovery mechanisms
+
+#### **Dual API Architecture**
+- **Original API**: Maintains exact same interface but now powered by RxJS internally
+- **RxJS Effects API**: New advanced API for reactive programming patterns
+- Seamless interoperability between both APIs in the same project
+
+### ✨ New Features
+
+#### **RxJS Effects API**
+- `twilioEffect()` - Main wrapper for creating reactive Twilio Functions
+- Stream-based composition with functional programming approach
+- Advanced error handling and automatic recovery
+
+#### **Comprehensive Operator Library**
+- **Injection Operators**: `injectEvent()`, `injectEnv()`, `injectClient()`, `injectProviders()`, `inject()`, `injectMany()`
+- **Validation Operators**: `requireFields()`, `validateEvent()`, `requireEnvVars()`, `authenticated()`, `transformEvent()`
+- **Response Operators**: `ok()`, `created()`, `accepted()`, `noContent()`, `toJsonResponse()`, `toTwiMLResponse()`, `redirect()`, `apiResponse()`, `withHeaders()`
+- **Error Handling Operators**: `handleError()`, `retryWithBackoff()`, `timeoutWithError()`, `validate()`, `fallback()`, `ensureResponse()`
+- **Flex Token Operators**: `validateFlexToken()`, `validateFlexTokenWithOptions()`, `requireFlexAuth()`
+- **Result Pattern Operators**: `handleResult()`, `toResultOk()`, `toResultFailed()`, `toResult()`, `mapResult()`, `switchMapResult()`
+
+#### **Advanced Testing Capabilities**
+- **Marble Testing**: `marbleTest()` for complex stream timing tests
+- **Effect Testing**: `testEffect()`, `mockEffect()`, `createEffectTestHarness()`
+- **Enhanced Mocking**: RxJS-powered mock system with same API
+- Stream assertion utilities: `expectEmissions()`, `expectError()`
+
+### 🔧 Technical Improvements
+
+#### **TypeScript Migration**
+- **Complete TypeScript rewrite** from JavaScript
+- Full type safety with proper generic inference
+- Comprehensive type definitions for both APIs
+- Enhanced IDE support and autocomplete
+
+#### **Enhanced Error Handling**
+- Stream-based error processing
+- Automatic error recovery mechanisms
+- Better error propagation and debugging
+- Enhanced error context and stack traces
+
+#### **Performance Optimizations**
+- Optimized stream processing with RxJS
+- Reduced memory footprint
+- Better garbage collection through proper stream disposal
+- Improved async operation handling
+
+### 📚 Documentation & Examples
+
+#### **Comprehensive Documentation Updates**
+- System requirements and compatibility guide
+- Development setup instructions
+- Complete TypeScript usage examples
+- Troubleshooting section with common issues and solutions
+- Community and support resources
+
+#### **New Examples**
+- RxJS Effects usage examples
+- TypeScript integration examples
+- Testing examples with marble testing
+- Migration comparison guide
+- Backward compatibility demonstrations
+
+### 🧪 Testing Infrastructure
+
+#### **Enhanced Test Suite**
+- Complete test coverage for RxJS architecture
+- Marble testing for complex stream scenarios
+- TypeScript test compilation
+- Enhanced mock infrastructure
+- Performance regression tests
+
+#### **Test Utilities**
+- `marbleTest()` for marble testing
+- `testEffect()` for Promise-based Effect testing
+- `mockEffect()` for Observable-based Effect testing
+- `createEffectTestHarness()` for reusable test setups
+
+### 🔄 Migration Notes
+
+#### **Zero Breaking Changes**
+- All existing v2.4.x code works without modification
+- Same function signatures and behavior
+- Same `this` context patterns in handlers
+- Same Result pattern and error handling
+- Same testing approaches
+
+#### **New Capabilities Available**
+- Optional RxJS Effects API for advanced use cases
+- Enhanced error handling with stream recovery
+- Marble testing for complex scenarios
+- Functional composition with operator libraries
+- Better performance through stream optimization
+
+### 📦 Dependencies
+
+#### **New Dependencies**
+- `rxjs@^7.8.2` - Core reactive programming library
+
+#### **Updated Dependencies**
+- Full TypeScript development environment
+- Enhanced testing infrastructure
+- Updated build pipeline
+
+### 🏗 Build System
+
+#### **TypeScript Compilation**
+- New TypeScript build pipeline
+- Enhanced type checking and inference
+- Optimized output for both CommonJS and ES modules
+- Source maps and declaration files
+
+#### **Development Experience**
+- Enhanced IDE support with full TypeScript types
+- Better debugging with source maps
+- Improved error messages and stack traces
+- Hot reload support for development
+
+### 📋 Files Changed
+
+#### **New Files**
+- `src/` - Complete TypeScript source tree
+- `src/lib/effects/` - RxJS Effects system
+- `src/lib/operators/` - Comprehensive operator library
+- `src/lib/testing/` - Enhanced testing utilities
+- `examples/rxjs-effects-example.js` - RxJS Effects examples
+- `examples/testing-effects-example.test.js` - Testing examples
+- `examples/migration-comparison.md` - Migration guide
+- `tsconfig.json` - TypeScript configuration
+
+#### **Enhanced Files**
+- `README.md` - Comprehensive documentation update
+- `package.json` - Updated to v2.5.0 with new dependencies
+- All test files updated with TypeScript and RxJS testing
+- Enhanced examples and documentation
+
+### 🎯 Use Cases
+
+This release enables:
+- **Simple Migration**: Drop-in replacement with enhanced performance
+- **Advanced Workflows**: Complex reactive programming with RxJS
+- **Better Testing**: Marble testing and enhanced mocking
+- **Type Safety**: Full TypeScript support with inference
+- **Performance**: Optimized stream processing and error handling
+
+### 🤝 Compatibility
+
+- **Node.js**: >= 14.0.0
+- **Twilio Runtime**: Full compatibility maintained
+- **TypeScript**: >= 5.0.0 (for TypeScript projects)
+- **Existing Code**: 100% backward compatible
+
+## [2.4.1] - 2024-XX-XX
+
+Previous release with JavaScript-based architecture.
+
 ## [2.3.0] - 2022-08-29
 
 ### Added
