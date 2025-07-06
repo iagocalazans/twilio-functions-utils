@@ -10,3 +10,11 @@ coverage/
 .env
 jsdoc.json
 docs/
+src/
+CLAUDE.md
+examples/
+.claude/
+jest.config.js
+jest.setup.js
+.eslintrc.yml
+tsconfig.json
