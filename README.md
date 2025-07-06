@@ -20,6 +20,44 @@ A powerful, **RxJS-powered** utility library that revolutionizes Twilio serverle
 npm install twilio-functions-utils
 ```
 
+## 📋 **Requirements & Compatibility**
+
+- **Node.js**: >= 14.0.0
+- **Twilio Runtime**: Compatible with Twilio Functions runtime
+- **TypeScript**: >= 5.0.0 (for TypeScript projects)
+- **Dependencies**: RxJS 7.8.2+, Twilio SDK 3.77.2+
+
+### **Peer Dependencies**
+- `twilio` - Twilio JavaScript SDK
+- `@twilio/runtime-handler` - For local development
+
+---
+
+## 🛠 **Development Setup**
+
+### **Building the Project**
+```bash
+npm run build        # Compile TypeScript to JavaScript
+npm run prebuild     # Clean build directory before building
+```
+
+### **Testing**
+```bash
+npm run test         # Run Jest test suite with coverage
+NODE_ENV=test npm test  # Ensure test environment
+```
+
+### **Documentation**
+```bash
+npm run docs         # Generate JSDoc documentation
+```
+
+### **Project Structure**
+The library supports flexible directory structures:
+- `./functions/` or `./src/functions/` for your Twilio Functions
+- `./assets/` or `./src/assets/` for static assets
+- Automatically detected during testing
+
 ---
 
 ## 🎯 **Quick Start**
@@ -101,6 +139,121 @@ const sendSmsEffect = context$ =>
   );
 
 exports.handler = twilioEffect(sendSmsEffect);
+```
+
+### **TypeScript Examples**
+
+```typescript
+import { 
+  useInjection, 
+  Response, 
+  BadRequestError, 
+  Result,
+  InjectorFunction,
+  ProviderFunction 
+} from 'twilio-functions-utils';
+
+// Type your environment variables
+interface MyEnv {
+  ACCOUNT_SID: string;
+  AUTH_TOKEN: string;
+  FROM_NUMBER: string;
+}
+
+// Type your event data
+interface SmsEvent {
+  to: string;
+  message: string;
+}
+
+// Type your providers
+interface MyProviders {
+  sendSms: (to: string, message: string) => Promise<Result<{ sid: string }, string>>;
+}
+
+// Provider with full typing
+const sendSmsProvider: ProviderFunction<SmsEvent, MyEnv> = async function (
+  to: string, 
+  message: string
+) {
+  const { client, env } = this;
+  
+  try {
+    const result = await client.messages.create({
+      to,
+      from: env.FROM_NUMBER,
+      body: message
+    });
+    return Result.ok({ sid: result.sid });
+  } catch (error: any) {
+    return Result.failed(error.message);
+  }
+};
+
+// Handler with full typing
+const sendSmsHandler: InjectorFunction<SmsEvent, MyEnv, MyProviders> = async function (event) {
+  const { env, providers } = this;
+  const { to, message } = event;
+  
+  if (!to || !message) {
+    return new BadRequestError('Missing required parameters');
+  }
+  
+  const result = await providers.sendSms(to, message);
+  
+  if (result.isError) {
+    return new BadRequestError(result.error);
+  }
+  
+  return new Response(result.data, 201);
+};
+
+// Export with types
+export const handler = useInjection<SmsEvent, MyEnv, MyProviders>(sendSmsHandler, {
+  providers: { sendSms: sendSmsProvider }
+});
+```
+
+### **RxJS Effects with TypeScript**
+
+```typescript
+import { 
+  twilioEffect, 
+  EffectWithContext,
+  EffectContext,
+  injectEvent, 
+  injectClient,
+  requireFields,
+  ok 
+} from 'twilio-functions-utils';
+import { switchMap, map } from 'rxjs/operators';
+
+interface SmsEnv {
+  FROM_NUMBER: string;
+}
+
+interface SmsEvent {
+  to: string;
+  message: string;
+}
+
+const sendSmsEffect: EffectWithContext<SmsEnv, {}, Response> = (context$) =>
+  context$.pipe(
+    requireFields<SmsEvent>('to', 'message'),
+    injectEvent<SmsEvent>(),
+    injectClient(),
+    switchMap(([event, client]) =>
+      client.messages.create({
+        to: event.to,
+        from: process.env.FROM_NUMBER,
+        body: event.message
+      })
+    ),
+    map(result => ({ sid: result.sid, status: 'sent' })),
+    ok()
+  );
+
+export const handler = twilioEffect<SmsEnv, {}>(sendSmsEffect);
 ```
 
 ---
@@ -378,6 +531,84 @@ But now you get:
 
 ---
 
+## 🔧 **Troubleshooting**
+
+### **Common Issues**
+
+#### **"Module not found" Error**
+```bash
+# Ensure you've installed the package
+npm install twilio-functions-utils
+
+# For TypeScript projects, ensure proper types
+npm install --save-dev typescript @types/node
+```
+
+#### **Testing Issues**
+```javascript
+// ❌ Wrong - Missing mock import
+const { useMock } = require('twilio-functions-utils');
+
+// ✅ Correct - Import mock first
+require('twilio-functions-utils/dist/lib/twilio.mock.js');
+const { useMock } = require('twilio-functions-utils');
+
+// Ensure NODE_ENV=test
+process.env.NODE_ENV = 'test';
+```
+
+#### **RxJS Operator Issues**
+```bash
+# Ensure RxJS is installed
+npm install rxjs@^7.8.2
+
+# Import operators correctly
+const { switchMap, map } = require('rxjs/operators');
+```
+
+#### **TypeScript Compilation Errors**
+```json
+// tsconfig.json - Ensure proper configuration
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  }
+}
+```
+
+#### **Runtime Context Issues**
+```javascript
+// ❌ Wrong - Arrow functions lose 'this' context
+const handler = (event) => {
+  // 'this' is undefined here
+};
+
+// ✅ Correct - Use regular functions
+async function handler(event) {
+  // 'this' context available here
+  const { env, providers } = this;
+}
+```
+
+### **Performance Tips**
+
+- Use `injectMany()` instead of multiple `inject()` calls
+- Leverage RxJS operators for complex data transformations
+- Use `Result` pattern to avoid try-catch overhead
+- Enable TypeScript strict mode for better optimization
+
+### **Getting Help**
+
+- 📖 Check [documentation](https://iagocalazans.github.io/twilio-functions-utils)
+- 🐛 Report bugs on [GitHub Issues](https://github.com/iagocalazans/twilio-functions-utils/issues)
+- 💬 Ask questions in [Twilio Community](https://www.twilio.com/community)
+
+---
+
 ## 🤝 **Contributing**
 
 We welcome contributions! Here's how you can help:
@@ -387,6 +618,31 @@ We welcome contributions! Here's how you can help:
 3. **📝 Improve docs** - Help make our documentation clearer
 4. **🧪 Write tests** - Add test cases for new features
 5. **🔧 Submit PRs** - Follow our coding standards and include tests
+
+---
+
+## 🌟 **Community & Support**
+
+### **📚 Resources**
+- 🏠 **[Project Homepage](https://iagocalazans.github.io/twilio-functions-utils)** - Documentation and guides
+- 📦 **[NPM Package](https://www.npmjs.com/package/twilio-functions-utils)** - Package details and versions
+- 🐙 **[GitHub Repository](https://github.com/iagocalazans/twilio-functions-utils)** - Source code and issues
+
+### **🆘 Getting Help**
+- 🐛 **[Report Issues](https://github.com/iagocalazans/twilio-functions-utils/issues)** - Bug reports and feature requests
+- 💬 **[Twilio Community](https://www.twilio.com/community)** - General Twilio development discussions
+- 📧 **[Contact Author](mailto:iago.calazans@gmail.com)** - Direct support for complex issues
+
+### **🤝 Contributing**
+- 🔀 **[Pull Requests](https://github.com/iagocalazans/twilio-functions-utils/pulls)** - Code contributions welcome
+- 📖 **[Contributing Guide](https://github.com/iagocalazans/twilio-functions-utils/blob/master/CONTRIBUTING.md)** - How to contribute
+- 🧪 **[Running Tests](https://github.com/iagocalazans/twilio-functions-utils#testing)** - Test your changes
+
+### **📊 Project Stats**
+- ![npm downloads](https://img.shields.io/npm/dw/twilio-functions-utils?style=flat-square)
+- ![GitHub stars](https://img.shields.io/github/stars/iagocalazans/twilio-functions-utils?style=flat-square)
+- ![GitHub issues](https://img.shields.io/github/issues/iagocalazans/twilio-functions-utils?style=flat-square)
+- ![Coverage Status](https://img.shields.io/coveralls/github/iagocalazans/twilio-functions-utils?style=flat-square)
 
 ---
 
